@@ -205,8 +205,7 @@ export const dictionary: Dictionary = {
       },
       plan: {
         title: "Plano de estudos",
-        description:
-          "Gere um plano semanal sob medida para seu nível e foco.",
+        description: "Gere um plano semanal sob medida para seu nível e foco.",
       },
       settings: {
         title: "Configurações",

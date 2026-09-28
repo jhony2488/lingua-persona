@@ -41,9 +41,7 @@ export function ProductTour() {
   const active = mounted && !tourCompleted && !waitingForOnboarding;
 
   const measure = useCallback(() => {
-    const target = document.querySelector(
-      `[data-tour="${STEP_KEYS[step]}"]`,
-    );
+    const target = document.querySelector(`[data-tour="${STEP_KEYS[step]}"]`);
     setRect(target ? target.getBoundingClientRect() : null);
   }, [step]);
 

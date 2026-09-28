@@ -53,9 +53,7 @@ describe("ProductTour", () => {
     for (let i = 0; i < 3; i++) {
       await user.click(within(dialog).getByRole("button", { name: "Next" }));
     }
-    await user.click(
-      within(dialog).getByRole("button", { name: "Finish" }),
-    );
+    await user.click(within(dialog).getByRole("button", { name: "Finish" }));
 
     expect(useSettings.getState().tourCompleted).toBe(true);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
