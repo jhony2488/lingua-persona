@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import type { Conversation, Message, User } from "@prisma/client";
 
 export class ApiError extends Error {
@@ -30,6 +31,15 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
+// No shell nativo (Android/iOS/desktop) não existe servidor remoto:
+// a camada local (sqlite do dispositivo) substitui o fetch para /api/*.
+async function local() {
+  const { localApi } = await import("@/lib/local-db/local-api");
+  return localApi;
+}
+
+const isNative = () => Capacitor.isNativePlatform();
+
 export interface CreateUserPayload {
   email: string;
   name: string;
@@ -50,35 +60,52 @@ export interface SendMessageResult {
 }
 
 export const api = {
-  createUser: (payload: CreateUserPayload) =>
-    apiFetch<User>("/api/users", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }),
+  createUser: (payload: CreateUserPayload): Promise<User> =>
+    isNative()
+      ? local().then((l) => l.createUser(payload))
+      : apiFetch<User>("/api/users", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        }),
 
-  listConversations: (userId?: string) =>
-    apiFetch<Conversation[]>(
-      userId ? `/api/conversations?userId=${userId}` : "/api/conversations",
-    ),
+  listConversations: (userId?: string): Promise<Conversation[]> =>
+    isNative()
+      ? local().then((l) => l.listConversations(userId))
+      : apiFetch<Conversation[]>(
+          userId ? `/api/conversations?userId=${userId}` : "/api/conversations",
+        ),
 
-  createConversation: (payload: CreateConversationPayload) =>
-    apiFetch<Conversation>("/api/conversations", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }),
+  createConversation: (
+    payload: CreateConversationPayload,
+  ): Promise<Conversation> =>
+    isNative()
+      ? local().then((l) => l.createConversation(payload))
+      : apiFetch<Conversation>("/api/conversations", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        }),
 
-  deleteConversation: (id: string) =>
-    apiFetch<void>(`/api/conversations/${id}`, { method: "DELETE" }),
+  deleteConversation: (id: string): Promise<void> =>
+    isNative()
+      ? local().then((l) => l.deleteConversation(id))
+      : apiFetch<void>(`/api/conversations/${id}`, { method: "DELETE" }),
 
-  listMessages: (conversationId: string) =>
-    apiFetch<Message[]>(`/api/conversations/${conversationId}/messages`),
+  listMessages: (conversationId: string): Promise<Message[]> =>
+    isNative()
+      ? local().then((l) => l.listMessages(conversationId))
+      : apiFetch<Message[]>(`/api/conversations/${conversationId}/messages`),
 
-  sendMessage: (conversationId: string, content: string) =>
-    apiFetch<SendMessageResult>(
-      `/api/conversations/${conversationId}/messages`,
-      {
-        method: "POST",
-        body: JSON.stringify({ content }),
-      },
-    ),
+  sendMessage: (
+    conversationId: string,
+    content: string,
+  ): Promise<SendMessageResult> =>
+    isNative()
+      ? local().then((l) => l.sendMessage(conversationId, content))
+      : apiFetch<SendMessageResult>(
+          `/api/conversations/${conversationId}/messages`,
+          {
+            method: "POST",
+            body: JSON.stringify({ content }),
+          },
+        ),
 };
