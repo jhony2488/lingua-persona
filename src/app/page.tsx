@@ -48,6 +48,12 @@ export default function Home() {
             Start practicing
           </Link>
           <Link
+            href="/plan"
+            className={buttonVariants({ variant: "outline", size: "lg" })}
+          >
+            Study plan
+          </Link>
+          <Link
             href="/settings"
             className={buttonVariants({ variant: "outline", size: "lg" })}
           >
