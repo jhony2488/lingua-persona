@@ -136,6 +136,9 @@ Para a versão em inglês, veja [README.en.md](README.en.md) e [docs/en/](docs/e
 - **Framework**: [Next.js 16](https://nextjs.org) com App Router e TypeScript
 - **Estilização**: Tailwind CSS v4
 - **Testes**: Jest + React Testing Library
+- **PWA**: [Serwist](https://serwist.pages.dev) (`@serwist/turbopack`)
+- **Estado**: [TanStack Query](https://tanstack.com/query) + [Zustand](https://zustand-demo.pmnd.rs)
+- **UI**: [shadcn/ui](https://ui.shadcn.com) (Base UI)
 - **LLM local**: [@mlc-ai/web-llm](https://github.com/mlc-ai/web-llm)
 - **Banco de dados**: SQLite via [Prisma ORM](https://www.prisma.io) (extensão vetorial planejada)
 - **Validação**: [Zod](https://zod.dev)
@@ -160,6 +163,11 @@ npm run db:push      # Sincroniza schema com o banco (sem migração)
 npm run db:generate  # Gera o Prisma Client
 ```
 
+## CI/CD
+
+- **CI**: `.github/workflows/ci.yml` — lint, format:check, testes e build em push/PR para `master`.
+- **Release**: `.github/workflows/release.yml` — em tags `v*.*.*`, gera `app-release.pk`, `app-release.rxe` e `SHA256SUMS.txt`, e publica a Release no GitHub.
+
 ## Licença
 
-Ainda a ser definida.
+[GNU GPL v3](LICENSE).

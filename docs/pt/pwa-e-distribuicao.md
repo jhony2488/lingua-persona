@@ -1,65 +1,58 @@
 # PWA e distribuição
 
-O LinguaPersona é uma aplicação web que pode ser instalada como PWA e empacotada para mobile e desktop.
+O LinguaPersona é uma PWA instalável construída com Next.js (Turbopack) e Serwist, com service worker, manifesto e suporte a instalação offline.
 
-## PWA
-
-Para permitir instalação nativa a partir do navegador, o Next.js precisa exportar arquivos estáticos e fornecer um `manifest.json`.
-
-### Configuração do Next.js
-
-```ts
-// next.config.ts
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  output: "export",
-  images: {
-    unoptimized: true,
-  },
-};
-
-export default nextConfig;
-```
+## Implementação atual
 
 ### Manifesto
 
-O arquivo `public/manifest.json` descreve o app para o navegador:
+O manifesto é gerado por `src/app/manifest.ts` (App Router) e servido em `/manifest.webmanifest`:
 
-```json
-{
-  "name": "Alex English Teacher",
-  "short_name": "Alex AI",
-  "description": "AI English Tutor powered by WebLLM",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#090d16",
-  "theme_color": "#f97316",
-  "icons": [
-    {
-      "src": "/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}
-```
+- `name`/`short_name`: **LinguaPersona**
+- `display: standalone`, `orientation: portrait`
+- `theme_color`/`background_color`: `#4f46e5` / `#ffffff`
+- Ícones em `public/icons/`: `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` (gerados por `scripts/generate-icons.mjs`)
+
+### Service worker (Serwist + Turbopack)
+
+O projeto usa `@serwist/turbopack`, que compila o service worker no build (esbuild) e o serve via Route Handler:
+
+- `src/app/sw.ts` — fonte do worker (Serwist)
+- `src/app/serwist/[path]/route.ts` — serve `/serwist/sw.js` e `/serwist/sw.js.map`
+- `src/components/pwa/sw-register.tsx` — registra o SW apenas em produção
+
+Estratégias de cache em `sw.ts`:
+
+- `/api/*` → **NetworkFirst** (timeout 5s, fallback para cache offline)
+- Navegação (`mode: "navigate"`) → **StaleWhileRevalidate**
+- Assets/ páginas → `defaultCache` do Serwist + precache do build
+- Fallback offline → `/~offline` (`src/app/~offline/page.tsx`)
+
+### Instalação
+
+`src/components/pwa/install-banner.tsx` intercepta `beforeinstallprompt` e exibe um banner customizado. O dismissal é persistido em `localStorage`.
+
+### Notificações
+
+`src/lib/notifications.ts` encapsula permissão (`Notification.requestPermission`) e assinatura push (`pushManager.getSubscription`). O Web Push com VAPID fica para uma fase futura.
+
+> **Nota**: o `output: "export"` não é usado — os Route Handlers (`/api/*`) exigem servidor Node. Para empacotar em Capacitor/Tauri, a API precisa ser hospedada separadamente ou embutida.
+
+## Empacotamento e releases (CI/CD)
+
+Dois workflows em `.github/workflows/`:
+
+- `ci.yml` — lint, format:check, testes e build em push/PR para `master`
+- `release.yml` — em tags `v*.*.*`: build → empacota `app-release.pk` (tar.gz de `.next/static`), `app-release.rxe` (zip de `.next`), `SHA256SUMS.txt` → Release no GitHub
 
 ## Matriz de compilação
 
-| Plataforma | Tecnologia            | Saída                  |
-| ---------- | --------------------- | ---------------------- |
-| Web/PWA    | Next.js static export | `out/`                 |
-| Android    | Capacitor             | `.apk` / `.aab`        |
-| iOS        | Capacitor             | `.ipa` (macOS + Xcode) |
-| Windows    | Tauri                 | `.exe` / `.msi`        |
-| macOS      | Tauri                 | `.dmg` / `.app`        |
-| Linux      | Tauri                 | `.AppImage` / `.deb`   |
+| Plataforma | Tecnologia        | Saída                              |
+| ---------- | ----------------- | ---------------------------------- |
+| Web/PWA    | Next.js + Serwist | `.next/` + `app-release.pk`/`.rxe` |
+| Android    | Capacitor         | `.apk` / `.aab` (requer API)       |
+| iOS        | Capacitor         | `.ipa` (macOS + Xcode, requer API) |
+| Desktop    | Tauri             | `.exe`/`.msi`/`.dmg` (requer API)  |
 
 ## Passos com o Capacitor
 
@@ -83,3 +76,4 @@ Os binários aparecem em `src-tauri/target/release`.
 
 - [Modelos locais](modelos-locais.md)
 - [Motor de inferência](motor-de-inferencia.md)
+- [Pesquisa vetorial local](pesquisa-vetorial-local.md)
