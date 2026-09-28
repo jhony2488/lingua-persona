@@ -87,6 +87,9 @@ the sidecar on localhost. Shared pure logic (`plan-generator`, Zod schemas,
   the PR body — prefer splitting into smaller deliveries.
 - **Tests**: every change must touch tests — update tests for modified
   behavior, add tests for new features.
+- **Ignore directives**: `eslint-disable`/`@ts-ignore`/`@ts-expect-error`/
+  `@ts-nocheck` only in test files (`__tests__/`, `e2e/`, `jest.env.ts`);
+  fix the cause in production code.
 - **Hooks**: Husky pre-commit runs `npm run lint`, pre-push runs
   `npm run test`. With `ignore-scripts`, activate once via `npx husky`.
 - **Migrations**: never edit an applied `prisma/migrations/*` file — create a
@@ -117,6 +120,7 @@ the sidecar on localhost. Shared pure logic (`plan-generator`, Zod schemas,
 | PWA & distribution               | [pwa-e-distribuicao.md](docs/pt/pwa-e-distribuicao.md)           | [pwa-and-distribution.md](docs/en/pwa-and-distribution.md) |
 | `.npmrc` security                | [npmrc.md](docs/pt/npmrc.md)                                     | [npmrc.md](docs/en/npmrc.md)                               |
 | SSH commit signing               | [assinatura-ssh.md](docs/pt/assinatura-ssh.md)                   | [ssh-signing.md](docs/en/ssh-signing.md)                   |
+| Ignore directives                | [diretivas-de-ignore.md](docs/pt/diretivas-de-ignore.md)         | [ignore-directives.md](docs/en/ignore-directives.md)       |
 
 See also: `README.md` / `README.en.md`, `CONTRIBUTING.md` /
 `CONTRIBUTING.en.md`.

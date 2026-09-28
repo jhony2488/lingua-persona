@@ -48,6 +48,10 @@ Thank you for helping build LinguaPersona. Before opening an issue or pull reque
   ```bash
   npx husky
   ```
+- Ignore comments (`eslint-disable`, `@ts-ignore`, `@ts-expect-error`,
+  `@ts-nocheck`) are only acceptable in test files (`__tests__/`, `e2e/`, test
+  helpers). In production code, fix the underlying problem instead of
+  silencing lint/typecheck. See [ignore directives](docs/en/ignore-directives.md).
 - Keep components small and focused.
 - Prefer functions and hooks over classes.
 - Name files and folders in English for ecosystem consistency (e.g., `inferenceEngine.ts`, `useAgentStore.ts`).
