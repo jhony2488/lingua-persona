@@ -26,7 +26,7 @@ Cache strategies in `sw.ts`:
 - `/api/*` → **NetworkFirst** (5s timeout, offline fallback to cache)
 - Navigation (`mode: "navigate"`) → **StaleWhileRevalidate**
 - Assets/pages → Serwist `defaultCache` + build precache
-- Offline fallback → `/~offline` (`src/app/~offline/page.tsx`)
+- Offline fallback → `/~offline` (`src/app/[lang]/~offline/page.tsx`)
 
 ### Installation
 
