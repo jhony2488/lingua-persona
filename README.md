@@ -48,6 +48,7 @@ O **LinguaPersona** é uma aplicação PWA/Next.js que permite conversar com um 
 - [Professor virtual](docs/pt/professor-virtual.md)
 - [Pesquisa vetorial local](docs/pt/pesquisa-vetorial-local.md)
 - [Configuração do `.npmrc`](docs/pt/npmrc.md)
+- [Assinatura SSH para commits](docs/pt/assinatura-ssh.md)
 - [Como contribuir](CONTRIBUTING.md)
 
 Para a versão em inglês, veja [README.en.md](README.en.md) e [docs/en/](docs/en/).

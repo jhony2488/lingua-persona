@@ -48,6 +48,7 @@ Complete English learning and conversation system powered by local AI and vector
 - [Virtual teacher](docs/en/virtual-teacher.md)
 - [Local vector search](docs/en/local-vector-search.md)
 - [`.npmrc` configuration](docs/en/npmrc.md)
+- [SSH signing for commits](docs/en/ssh-signing.md)
 - [How to contribute](CONTRIBUTING.en.md)
 
 For the Portuguese version, see [README.md](README.md) and [docs/pt/](docs/pt/).

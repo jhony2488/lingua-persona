@@ -25,6 +25,7 @@ Obrigado por querer ajudar a construir o LinguaPersona. Antes de abrir uma issue
   - `adiciona fallback para Ollama`
   - `corrige timeout de gravação de voz`
   - `atualiza documentação do motor de inferência`
+- **Todos os commits devem ser assinados com SSH**. Veja o [guia de configuração](docs/pt/assinatura-ssh.md).
 
 ## Padrão de código
 
