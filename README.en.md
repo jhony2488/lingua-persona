@@ -47,6 +47,7 @@ Complete English learning and conversation system powered by local AI and vector
 - [Local models](docs/en/local-models.md)
 - [Virtual teacher](docs/en/virtual-teacher.md)
 - [Local vector search](docs/en/local-vector-search.md)
+- [`.npmrc` configuration](docs/en/npmrc.md)
 - [How to contribute](CONTRIBUTING.en.md)
 
 For the Portuguese version, see [README.md](README.md) and [docs/pt/](docs/pt/).
