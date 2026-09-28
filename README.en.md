@@ -35,6 +35,84 @@ Complete English learning and conversation system powered by local AI and vector
 └─────────────────────────────────────────────┘
 ```
 
+## Running locally
+
+Even without programming experience, you can run the project by following the steps below.
+
+### Prerequisites
+
+- **Node.js 20 or newer** — download the LTS version at [nodejs.org](https://nodejs.org). To check if it's already installed, open a terminal and run `node --version`.
+- **Git** — download at [git-scm.com](https://git-scm.com). Verify with `git --version`.
+
+### Step by step
+
+1. **Download the project**:
+
+   ```bash
+   git clone <repository-url>
+   cd linguapersona
+   ```
+
+2. **Install dependencies** (downloads everything the project needs):
+
+   ```bash
+   npm install
+   ```
+
+3. **Create the environment file** — copy the example file:
+
+   - Windows (PowerShell): `Copy-Item .env.example .env`
+   - Linux/macOS: `cp .env.example .env`
+
+   The `.env` file already comes configured with `DATABASE_URL="file:./dev.db"`. Since the database is SQLite, **you don't need to install any database server** — data is stored in a local file.
+
+4. **Prepare the database** (creates the tables):
+
+   ```bash
+   npm run db:migrate
+   ```
+
+5. **Start the application**:
+
+   ```bash
+   npm run dev
+   ```
+
+6. **Open the browser**: go to `http://localhost:3000`
+
+### Testing the API
+
+With the server running, test the endpoints in your browser or with `curl`:
+
+- `GET /api/health` — server status (`{ "status": "ok" }`)
+- `GET /api/users` — list users
+- `POST /api/users` — create a user (`email`, `name`, `englishLevel`, `preferredDialect`)
+- `GET /api/conversations` — list conversations (accepts `?userId=`)
+- `POST /api/conversations` — create a conversation for a user
+
+Example:
+
+```bash
+curl -X POST http://localhost:3000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"ana@example.com","name":"Ana"}'
+```
+
+### Running the tests
+
+```bash
+npm run test
+```
+
+Tests use a separate SQLite database (`prisma/test.db`), created automatically — nothing to configure.
+
+### Common issues
+
+- **`npm` is not recognized**: close and reopen the terminal after installing Node.js.
+- **Port 3000 already in use**: run `npm run dev -- --port 3001` and open `http://localhost:3001`.
+- **Database error**: run `npm run db:push` to recreate the tables.
+- **Permission denied**: the project does not need an administrator terminal; if the error persists, check your antivirus/firewall.
+
 ## Documentation
 
 - [Architecture overview](docs/en/architecture.md)
@@ -59,7 +137,9 @@ For the Portuguese version, see [README.md](README.md) and [docs/pt/](docs/pt/).
 - **Styling**: Tailwind CSS v4
 - **Testing**: Jest + React Testing Library
 - **Local LLM**: [@mlc-ai/web-llm](https://github.com/mlc-ai/web-llm)
-- **Database**: SQLite with vector extension (sqlite-vec)
+- **Database**: SQLite via [Prisma ORM](https://www.prisma.io) (vector extension planned)
+- **Validation**: [Zod](https://zod.dev)
+- **Network mocking**: [MSW](https://mswjs.io)
 - **Embeddings**: Transformers.js (Xenova/all-MiniLM-L6-v2)
 - **Voice**: Web Speech API
 - **Mobile distribution**: Capacitor
@@ -75,6 +155,9 @@ npm run lint         # Run ESLint
 npm run test         # Run Jest tests
 npm run format       # Format project with Prettier
 npm run format:check # Check formatting
+npm run db:migrate   # Create/apply Prisma migrations
+npm run db:push      # Sync schema to the database (no migration)
+npm run db:generate  # Generate the Prisma Client
 ```
 
 ## License

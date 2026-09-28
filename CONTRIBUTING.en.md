@@ -21,10 +21,11 @@ Thank you for helping build LinguaPersona. Before opening an issue or pull reque
 ## Commits
 
 - Commit messages should be clear and explain the "why" of the change.
-- Prefer imperative, short titles in Portuguese or English:
-  - `adiciona fallback para Ollama`
-  - `corrige timeout de gravação de voz`
-  - `atualiza documentação do motor de inferência`
+- **All commits must be written in English only**, in imperative mood, using one of the prefixes below:
+  - `feat:` — new feature — `feat: add Ollama fallback`
+  - `bug:` — bug fix — `bug: fix voice recording timeout`
+  - `doc:` — documentation — `doc: update inference engine guide`
+  - `chore:` — maintenance and configuration — `chore: update dependencies`
 - **All commits must be SSH-signed**. See the [setup guide](docs/en/ssh-signing.md).
 
 ## Code style

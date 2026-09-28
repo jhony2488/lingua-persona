@@ -21,10 +21,11 @@ Obrigado por querer ajudar a construir o LinguaPersona. Antes de abrir uma issue
 ## Commits
 
 - Mensagens de commit devem ser claras e explicar o "porquê" da mudança.
-- Prefira o padrão de título imperativo, em português ou inglês:
-  - `adiciona fallback para Ollama`
-  - `corrige timeout de gravação de voz`
-  - `atualiza documentação do motor de inferência`
+- **Todos os commits devem ser escritos apenas em inglês**, no imperativo, com um dos prefixos abaixo:
+  - `feat:` — nova funcionalidade — `feat: add Ollama fallback`
+  - `bug:` — correção de bug — `bug: fix voice recording timeout`
+  - `doc:` — documentação — `doc: update inference engine guide`
+  - `chore:` — manutenção e configuração — `chore: update dependencies`
 - **Todos os commits devem ser assinados com SSH**. Veja o [guia de configuração](docs/pt/assinatura-ssh.md).
 
 ## Padrão de código
