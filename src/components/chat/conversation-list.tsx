@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MessageSquarePlus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "@/i18n/format";
+import { useDict, useLocale } from "@/i18n/provider";
 import { api } from "@/lib/api-client";
 import { useSettings } from "@/lib/store/settings";
 import { cn } from "@/lib/utils";
@@ -17,6 +19,8 @@ export function ConversationList({
   selectedId,
   onSelect,
 }: ConversationListProps) {
+  const dict = useDict();
+  const locale = useLocale();
   const userId = useSettings((state) => state.userId);
   const dialect = useSettings((state) => state.dialect);
   const level = useSettings((state) => state.level);
@@ -32,7 +36,9 @@ export function ConversationList({
     mutationFn: () =>
       api.createConversation({
         userId: userId ?? "",
-        title: `Practice ${new Date().toLocaleDateString()}`,
+        title: format(dict.chat.practiceWithDate, {
+          date: new Date().toLocaleDateString(locale),
+        }),
         dialect,
         level,
       }),
@@ -57,16 +63,18 @@ export function ConversationList({
         disabled={!userId || createMutation.isPending}
       >
         <MessageSquarePlus className="size-4" />
-        New conversation
+        {dict.chat.newConversation}
       </Button>
       <ScrollArea className="max-h-[60vh]">
         <ul className="flex flex-col gap-1">
           {isPending && (
-            <li className="text-muted-foreground p-2 text-sm">Loading…</li>
+            <li className="text-muted-foreground p-2 text-sm">
+              {dict.chat.loading}
+            </li>
           )}
           {!isPending && conversations.length === 0 && (
             <li className="text-muted-foreground p-2 text-sm">
-              No conversations yet.
+              {dict.chat.noConversations}
             </li>
           )}
           {conversations.map((conversation) => (
@@ -79,7 +87,7 @@ export function ConversationList({
                   selectedId === conversation.id && "bg-accent",
                 )}
               >
-                {conversation.title ?? "Untitled"}
+                {conversation.title ?? dict.chat.untitled}
                 <span className="text-muted-foreground ml-2 text-xs">
                   {conversation.level}
                 </span>
@@ -89,7 +97,7 @@ export function ConversationList({
                 size="icon"
                 className="invisible size-7 group-hover:visible"
                 onClick={() => deleteMutation.mutate(conversation.id)}
-                aria-label="Delete conversation"
+                aria-label={dict.chat.deleteConversation}
               >
                 <Trash2 className="size-4" />
               </Button>

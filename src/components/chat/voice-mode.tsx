@@ -13,6 +13,8 @@ import { TopicChips } from "@/components/chat/topic-chips";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import { format } from "@/i18n/format";
+import { useDict } from "@/i18n/provider";
 import type { SendMessageResult } from "@/lib/api-client";
 import {
   createSpeechRecognition,
@@ -27,14 +29,6 @@ import { cn } from "@/lib/utils";
 const SILENCE_TIMEOUT_MS = 10_000;
 
 type VoiceStatus = "idle" | "listening" | "thinking" | "speaking" | "error";
-
-const STATUS_LABEL: Record<VoiceStatus, string> = {
-  idle: "Tap to talk",
-  listening: "Listening…",
-  thinking: "Thinking…",
-  speaking: "Speaking…",
-  error: "Something went wrong",
-};
 
 interface VoiceModeProps {
   selectedId: string | null;
@@ -53,6 +47,7 @@ export function VoiceMode({
   onSend,
   onSelectTopic,
 }: VoiceModeProps) {
+  const dict = useDict();
   const dialect = useSettings((s) => s.dialect);
   const agentName = useSettings((s) => s.agentName);
   const agentGender = useSettings((s) => s.agentGender);
@@ -210,12 +205,20 @@ export function VoiceMode({
     .reverse()
     .find((m) => m.role === "assistant");
 
+  const statusLabel: Record<VoiceStatus, string> = {
+    idle: dict.voice.tapToTalk,
+    listening: dict.voice.listening,
+    thinking: dict.voice.thinking,
+    speaking: dict.voice.speaking,
+    error: dict.voice.errorRetry,
+  };
+
   if (!supported) {
     return (
       <div className="text-muted-foreground flex flex-1 flex-col items-center justify-center gap-3 p-6 text-sm">
         <MicOff className="size-8" />
-        <p>Speech recognition is not supported in this browser.</p>
-        <p className="text-xs">Switch to chat mode to keep practicing.</p>
+        <p>{dict.voice.speechUnsupported}</p>
+        <p className="text-xs">{dict.voice.speechUnsupportedHint}</p>
       </div>
     );
   }
@@ -225,7 +228,7 @@ export function VoiceMode({
       <div className="flex flex-1 flex-col items-center justify-center gap-6 p-6">
         <Orb status="idle" />
         <p className="text-muted-foreground text-sm">
-          Pick a conversation topic and start talking with {agentName}.
+          {format(dict.voice.pickTopic, { name: agentName })}
         </p>
         <TopicChips conversations={conversations} onSelect={onSelectTopic} />
       </div>
@@ -260,7 +263,9 @@ export function VoiceMode({
           onClick={handleOrbPress}
           disabled={status === "thinking"}
           aria-label={
-            status === "listening" ? "Stop listening" : "Start talking"
+            status === "listening"
+              ? dict.chat.stopListening
+              : dict.voice.startTalking
           }
           className="rounded-full outline-none focus-visible:ring-4 focus-visible:ring-ring/50"
         >
@@ -268,9 +273,7 @@ export function VoiceMode({
         </button>
 
         <p className="text-muted-foreground text-sm font-medium">
-          {status === "error"
-            ? "Could not reach the teacher. Tap to try again."
-            : STATUS_LABEL[status]}
+          {statusLabel[status]}
         </p>
 
         {(interim ||
@@ -282,7 +285,7 @@ export function VoiceMode({
               <>
                 {lastUser && (
                   <p className="text-muted-foreground text-xs">
-                    You: {lastUser.content}
+                    {dict.voice.you}: {lastUser.content}
                   </p>
                 )}
                 {lastAssistant && (
@@ -300,7 +303,7 @@ export function VoiceMode({
             <Textarea
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
-              placeholder="Your speech appears here — edit and send."
+              placeholder={dict.voice.draftPlaceholder}
               rows={2}
               className="resize-none text-sm"
             />
@@ -311,7 +314,7 @@ export function VoiceMode({
                 if (content) void sendAndSpeak(content);
               }}
               disabled={!draft.trim() || pending}
-              aria-label="Send message"
+              aria-label={dict.chat.sendMessage}
             >
               <SendHorizonal className="size-4" />
             </Button>
@@ -333,7 +336,7 @@ export function VoiceMode({
                   : "text-muted-foreground hover:bg-accent",
               )}
             >
-              {flow === "auto" ? "Auto" : "Confirm"}
+              {flow === "auto" ? dict.voice.flowAuto : dict.voice.flowConfirm}
             </button>
           ))}
         </div>
@@ -344,7 +347,7 @@ export function VoiceMode({
               variant="ghost"
               size="icon"
               onClick={endSession}
-              aria-label="Stop session"
+              aria-label={dict.voice.stopSession}
             >
               <Square className="size-4" />
             </Button>
@@ -353,7 +356,7 @@ export function VoiceMode({
             variant="ghost"
             size="icon"
             onClick={() => setHistoryOpen((open) => !open)}
-            aria-label="Toggle transcript history"
+            aria-label={dict.voice.toggleHistory}
             aria-expanded={historyOpen}
           >
             <History className="size-4" />

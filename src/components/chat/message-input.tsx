@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { VoiceButton } from "@/components/chat/voice-button";
+import { useDict } from "@/i18n/provider";
 import type { Dialect } from "@/lib/store/settings";
 
 interface MessageInputProps {
@@ -20,6 +21,7 @@ export function MessageInput({
   pending,
   onSend,
 }: MessageInputProps) {
+  const dict = useDict();
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -49,8 +51,8 @@ export function MessageInput({
         }}
         placeholder={
           disabled
-            ? "Select a conversation first"
-            : "Type or dictate a message…"
+            ? dict.chat.selectConversationFirst
+            : dict.chat.typeMessage
         }
         disabled={disabled}
         rows={2}
@@ -67,7 +69,7 @@ export function MessageInput({
         size="icon"
         onClick={submit}
         disabled={disabled || pending || !value.trim()}
-        aria-label="Send message"
+        aria-label={dict.chat.sendMessage}
       >
         <SendHorizonal className="size-4" />
       </Button>

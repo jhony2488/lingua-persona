@@ -11,10 +11,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useDict } from "@/i18n/provider";
 import { api } from "@/lib/api-client";
 import { useSettings } from "@/lib/store/settings";
 
 export function OnboardingDialog({ open }: { open: boolean }) {
+  const dict = useDict();
   const setUserId = useSettings((state) => state.setUserId);
   const dialect = useSettings((state) => state.dialect);
   const level = useSettings((state) => state.level);
@@ -36,11 +38,8 @@ export function OnboardingDialog({ open }: { open: boolean }) {
     <Dialog open={open}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Welcome to LinguaPersona</DialogTitle>
-          <DialogDescription>
-            Tell us your name and email to start practicing. Your data stays on
-            this device.
-          </DialogDescription>
+          <DialogTitle>{dict.onboarding.title}</DialogTitle>
+          <DialogDescription>{dict.onboarding.description}</DialogDescription>
         </DialogHeader>
         <form
           className="flex flex-col gap-3"
@@ -50,25 +49,25 @@ export function OnboardingDialog({ open }: { open: boolean }) {
           }}
         >
           <Input
-            placeholder="Your name"
+            placeholder={dict.onboarding.namePlaceholder}
             value={name}
             onChange={(event) => setName(event.target.value)}
             required
           />
           <Input
             type="email"
-            placeholder="you@example.com"
+            placeholder={dict.onboarding.emailPlaceholder}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
           />
           {mutation.isError && (
             <p className="text-destructive text-sm">
-              Could not create your profile. Try again.
+              {dict.onboarding.error}
             </p>
           )}
           <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? "Saving…" : "Start"}
+            {mutation.isPending ? dict.onboarding.saving : dict.onboarding.start}
           </Button>
         </form>
       </DialogContent>

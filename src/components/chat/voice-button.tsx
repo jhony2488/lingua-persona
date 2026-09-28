@@ -3,6 +3,7 @@
 import { Mic, MicOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useDict } from "@/i18n/provider";
 import {
   createSpeechRecognition,
   speechLang,
@@ -23,6 +24,7 @@ export function VoiceButton({
   onTranscript,
   disabled,
 }: VoiceButtonProps) {
+  const dict = useDict();
   const [listening, setListening] = useState(false);
   const [supported, setSupported] = useState(true);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
@@ -90,7 +92,7 @@ export function VoiceButton({
         variant="outline"
         size="icon"
         disabled
-        title="Speech recognition not supported"
+        title={dict.chat.speechNotSupported}
       >
         <MicOff className="size-4" />
       </Button>
@@ -103,7 +105,9 @@ export function VoiceButton({
       size="icon"
       onClick={toggle}
       disabled={disabled}
-      title={listening ? "Stop listening" : "Start voice input"}
+      title={
+        listening ? dict.chat.stopListening : dict.chat.startVoiceInput
+      }
       aria-pressed={listening}
     >
       <Mic className="size-4" />

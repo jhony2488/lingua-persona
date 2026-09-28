@@ -4,6 +4,7 @@ import type { Message } from "@prisma/client";
 import { Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useDict } from "@/i18n/provider";
 import { speak } from "@/lib/speech";
 import { useSettings, type Dialect } from "@/lib/store/settings";
 import { cn } from "@/lib/utils";
@@ -16,10 +17,11 @@ interface MessageListProps {
 
 export function MessageList({ messages, dialect, pending }: MessageListProps) {
   const agentGender = useSettings((s) => s.agentGender);
+  const dict = useDict();
   if (messages.length === 0 && !pending) {
     return (
       <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
-        Say hello to start practicing.
+        {dict.chat.sayHello}
       </div>
     );
   }
@@ -46,7 +48,7 @@ export function MessageList({ messages, dialect, pending }: MessageListProps) {
                 onClick={() =>
                   speak(message.content, { dialect, gender: agentGender })
                 }
-                aria-label="Play message"
+                aria-label={dict.chat.playMessage}
               >
                 <Volume2 className="size-3" />
               </Button>
@@ -55,7 +57,7 @@ export function MessageList({ messages, dialect, pending }: MessageListProps) {
         ))}
         {pending && (
           <li className="bg-muted text-muted-foreground self-start rounded-lg px-4 py-2 text-sm">
-            Teacher is typing…
+            {dict.chat.teacherTyping}
           </li>
         )}
       </ul>

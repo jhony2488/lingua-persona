@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useDict } from "@/i18n/provider";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -11,6 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 const DISMISSED_KEY = "linguapersona-install-dismissed";
 
 export function InstallBanner() {
+  const dict = useDict();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(
     null,
   );
@@ -46,16 +48,13 @@ export function InstallBanner() {
   return (
     <div className="bg-background/95 fixed inset-x-0 bottom-0 z-50 border-t p-4 backdrop-blur">
       <div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
-        <p className="text-sm">
-          Install LinguaPersona on your device for a faster, offline-ready
-          experience.
-        </p>
+        <p className="text-sm">{dict.installBanner.text}</p>
         <div className="flex gap-2">
           <Button size="sm" onClick={install}>
-            Install
+            {dict.installBanner.install}
           </Button>
           <Button size="sm" variant="ghost" onClick={dismiss}>
-            Not now
+            {dict.installBanner.notNow}
           </Button>
         </div>
       </div>
