@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # .npmrc disables lifecycle scripts (ignore-scripts=true) for security.
+      # Prisma's query engines are downloaded via postinstall, so we rebuild
+      # only the packages that strictly need native binaries.
+      - name: Restore Prisma engines
+        run: npm rebuild @prisma/engines esbuild
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Tests
+        run: npm run test
+
+      - name: Build
+        run: npm run build
