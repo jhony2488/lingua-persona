@@ -18,6 +18,7 @@ model User {
   conversations    Conversation[]
 
   @@index([createdAt])
+  @@index([englishLevel])
 }
 
 model Conversation {
@@ -32,6 +33,7 @@ model Conversation {
   messages  Message[]
 
   @@index([createdAt])
+  @@index([updatedAt])
   @@index([userId, createdAt])
 }
 
@@ -43,5 +45,7 @@ model Message {
   content        String
   createdAt      DateTime     @default(now())
 
+  @@index([role])
   @@index([conversationId, createdAt])
+  @@index([conversationId, role, createdAt])
 }
