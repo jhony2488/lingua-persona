@@ -69,8 +69,7 @@ export const dictionary: Dictionary = {
     thinking: "Pensando…",
     speaking: "Hablando…",
     errorRetry: "No se pudo contactar al profesor. Toca para reintentar.",
-    pickTopic:
-      "Elige un tema de conversación y empieza a hablar con {name}.",
+    pickTopic: "Elige un tema de conversación y empieza a hablar con {name}.",
     speechUnsupported:
       "El reconocimiento de voz no es compatible con este navegador.",
     speechUnsupportedHint: "Cambia al modo chat para seguir practicando.",

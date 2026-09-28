@@ -68,8 +68,7 @@ export const dictionary = {
     speaking: "Speaking…",
     errorRetry: "Could not reach the teacher. Tap to try again.",
     pickTopic: "Pick a conversation topic and start talking with {name}.",
-    speechUnsupported:
-      "Speech recognition is not supported in this browser.",
+    speechUnsupported: "Speech recognition is not supported in this browser.",
     speechUnsupportedHint: "Switch to chat mode to keep practicing.",
     startTalking: "Start talking",
     stopSession: "Stop session",

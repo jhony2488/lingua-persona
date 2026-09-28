@@ -1,13 +1,7 @@
 "use client";
 
 import type { Conversation, Message } from "@prisma/client";
-import {
-  History,
-  Mic,
-  MicOff,
-  SendHorizonal,
-  Square,
-} from "lucide-react";
+import { History, Mic, MicOff, SendHorizonal, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { TopicChips } from "@/components/chat/topic-chips";
 import { Button } from "@/components/ui/button";
@@ -168,10 +162,7 @@ export function VoiceMode({
         gender: agentGender,
         onEnd: () => {
           setStatusSynced("idle");
-          if (
-            voiceFlowRef.current === "auto" &&
-            sessionActiveRef.current
-          ) {
+          if (voiceFlowRef.current === "auto" && sessionActiveRef.current) {
             startListening();
           }
         },
@@ -267,7 +258,7 @@ export function VoiceMode({
               ? dict.chat.stopListening
               : dict.voice.startTalking
           }
-          className="rounded-full outline-none focus-visible:ring-4 focus-visible:ring-ring/50"
+          className="focus-visible:ring-ring/50 rounded-full outline-none focus-visible:ring-4"
         >
           <Orb status={status} />
         </button>

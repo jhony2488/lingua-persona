@@ -37,8 +37,7 @@ export function createSpeechRecognition(): SpeechRecognitionLike | null {
 }
 
 const MALE_HINTS = /\b(male|david|alex|daniel|fred|george)/i;
-const FEMALE_HINTS =
-  /\b(female|samantha|victoria|kate|stephanie|zira|susan)/i;
+const FEMALE_HINTS = /\b(female|samantha|victoria|kate|stephanie|zira|susan)/i;
 
 export interface VoiceLike {
   lang: string;

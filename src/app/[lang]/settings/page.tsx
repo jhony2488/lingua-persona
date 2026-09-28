@@ -82,9 +82,7 @@ export default function SettingsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="male">
-                  {dict.settings.voiceMale}
-                </SelectItem>
+                <SelectItem value="male">{dict.settings.voiceMale}</SelectItem>
                 <SelectItem value="female">
                   {dict.settings.voiceFemale}
                 </SelectItem>

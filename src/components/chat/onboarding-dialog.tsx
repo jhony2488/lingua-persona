@@ -62,12 +62,12 @@ export function OnboardingDialog({ open }: { open: boolean }) {
             required
           />
           {mutation.isError && (
-            <p className="text-destructive text-sm">
-              {dict.onboarding.error}
-            </p>
+            <p className="text-destructive text-sm">{dict.onboarding.error}</p>
           )}
           <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? dict.onboarding.saving : dict.onboarding.start}
+            {mutation.isPending
+              ? dict.onboarding.saving
+              : dict.onboarding.start}
           </Button>
         </form>
       </DialogContent>

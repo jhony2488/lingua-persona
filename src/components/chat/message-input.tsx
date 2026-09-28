@@ -50,9 +50,7 @@ export function MessageInput({
           }
         }}
         placeholder={
-          disabled
-            ? dict.chat.selectConversationFirst
-            : dict.chat.typeMessage
+          disabled ? dict.chat.selectConversationFirst : dict.chat.typeMessage
         }
         disabled={disabled}
         rows={2}

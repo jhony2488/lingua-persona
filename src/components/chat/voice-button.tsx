@@ -105,9 +105,7 @@ export function VoiceButton({
       size="icon"
       onClick={toggle}
       disabled={disabled}
-      title={
-        listening ? dict.chat.stopListening : dict.chat.startVoiceInput
-      }
+      title={listening ? dict.chat.stopListening : dict.chat.startVoiceInput}
       aria-pressed={listening}
     >
       <Mic className="size-4" />

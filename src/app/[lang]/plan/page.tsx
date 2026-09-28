@@ -14,7 +14,7 @@ import type { PlanJson, WeekPlan } from "@/modules/study/plan-generator";
 function WeekCard({ week }: { week: WeekPlan }) {
   const dict = useDict();
   return (
-    <li className="rounded-lg border bg-card p-4">
+    <li className="bg-card rounded-lg border p-4">
       <h3 className="font-semibold">
         {format(dict.plan.weekTitle, { week: week.week, theme: week.theme })}
       </h3>
@@ -22,20 +22,22 @@ function WeekCard({ week }: { week: WeekPlan }) {
         {week.topics.map((topic) => (
           <span
             key={topic}
-            className="rounded-full border bg-muted px-2 py-0.5 text-xs"
+            className="bg-muted rounded-full border px-2 py-0.5 text-xs"
           >
             {topic}
           </span>
         ))}
       </div>
-      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+      <ul className="text-muted-foreground mt-3 list-disc space-y-1 pl-5 text-sm">
         {week.study.map((item) => (
           <li key={item.slug}>
             {format(dict.plan.studyItem, { title: item.title })}
           </li>
         ))}
         {week.reading && (
-          <li>{format(dict.plan.readingItem, { title: week.reading.title })}</li>
+          <li>
+            {format(dict.plan.readingItem, { title: week.reading.title })}
+          </li>
         )}
         {week.goals.map((goal) => (
           <li key={goal}>{goal}</li>
@@ -53,7 +55,7 @@ function PlanCard({ plan }: { plan: StudyPlan }) {
     <section className="space-y-3">
       <div>
         <h2 className="text-lg font-semibold">{planJson.summary}</h2>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           {format(dict.plan.levelCreated, {
             level: plan.level,
             date: new Date(plan.createdAt).toLocaleDateString(locale),
@@ -86,8 +88,7 @@ export default function PlanPage() {
   });
 
   const generateMutation = useMutation({
-    mutationFn: () =>
-      api.generateStudyPlan({ userId: userId!, weeks, focus }),
+    mutationFn: () => api.generateStudyPlan({ userId: userId!, weeks, focus }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["study-plans", userId] }),
   });
@@ -119,7 +120,7 @@ export default function PlanPage() {
       ) : (
         <div className="space-y-8">
           <form
-            className="flex flex-wrap items-end gap-3 rounded-lg border bg-card p-4"
+            className="bg-card flex flex-wrap items-end gap-3 rounded-lg border p-4"
             onSubmit={(event) => {
               event.preventDefault();
               generateMutation.mutate();
@@ -128,7 +129,7 @@ export default function PlanPage() {
             <label className="grid gap-1 text-sm">
               {dict.plan.weeks}
               <select
-                className="rounded-md border bg-background px-2 py-1"
+                className="bg-background rounded-md border px-2 py-1"
                 value={weeks}
                 onChange={(event) => setWeeks(Number(event.target.value))}
               >
@@ -142,7 +143,7 @@ export default function PlanPage() {
             <label className="grid gap-1 text-sm">
               {dict.plan.focus}
               <select
-                className="rounded-md border bg-background px-2 py-1"
+                className="bg-background rounded-md border px-2 py-1"
                 value={focus}
                 onChange={(event) =>
                   setFocus(
@@ -165,7 +166,7 @@ export default function PlanPage() {
                 : dict.plan.generate}
             </button>
             {generateMutation.isError && (
-              <p className="text-sm text-destructive">
+              <p className="text-destructive text-sm">
                 {generateMutation.error.message}
               </p>
             )}
