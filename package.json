@@ -13,13 +13,23 @@
     "test:watch": "jest --watch",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "mobile:sync": "cap sync",
+    "build:mobile": "node scripts/build-mobile.mjs",
+    "build:standalone": "node scripts/build-standalone.mjs",
+    "sidecar:bin": "node scripts/fetch-node-bin.mjs",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
+    "@capacitor-community/sqlite": "^8.1.1",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/ios": "^8.5.2",
     "@prisma/client": "^6.19.3",
     "@serwist/turbopack": "^9.5.12",
     "@tanstack/react-query": "^5.104.0",
+    "@tauri-apps/api": "^2.12.0",
     "@types/pngjs": "^6.0.5",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
@@ -36,8 +46,10 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
     "@swc/jest": "^0.2.39",
     "@tailwindcss/postcss": "^4",
+    "@tauri-apps/cli": "^2.12.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",

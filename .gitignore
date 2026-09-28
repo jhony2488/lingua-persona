@@ -57,6 +57,16 @@ yarn-error.log*
 *.rxe
 SHA256SUMS.txt
 
+# native builds (generated in CI / locally via cap sync)
+/android/
+/ios/
+/src-tauri/target/
+/src-tauri/gen/
+/src-tauri/binaries/
+/src-tauri/resources/
+/.next-mobile-stash/
+/.sidecar-tmp/
+
 # vercel
 .vercel
 

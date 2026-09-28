@@ -23,7 +23,20 @@ const transpilePackages = [
   "graphql",
 ];
 
+// MOBILE_EXPORT=1 → static export p/ webDir do Capacitor (api/ e serwist/
+// são removidos temporariamente por scripts/build-mobile.mjs).
+// Default → standalone p/ sidecar Tauri e self-host.
+const isMobileExport = process.env.MOBILE_EXPORT === "1";
+
 const nextConfig: NextConfig = {
+  output: isMobileExport ? "export" : "standalone",
+  ...(isMobileExport && {
+    images: { unoptimized: true },
+    // api/ e serwist/ são stashed durante o export mobile; os testes
+    // referenciam essas rotas e quebrariam o typecheck do build.
+    // Typecheck completo segue rodando no build normal e no CI.
+    typescript: { ignoreBuildErrors: true },
+  }),
   transpilePackages,
 };
 

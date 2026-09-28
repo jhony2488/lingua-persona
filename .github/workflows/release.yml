@@ -1,4 +1,4 @@
-name: Build, PWA Package & Publish GitHub Release
+name: Build, Package & Publish GitHub Release
 
 on:
   push:
@@ -6,11 +6,11 @@ on:
       - "v*.*.*" # Dispara quando tags no formato v1.0.0, v2.1.0 forem enviadas
 
 jobs:
-  build-and-release:
+  # ---------------------------------------------------------------
+  # Web/PWA: build Next.js + pacotes .pk / .rxe
+  # ---------------------------------------------------------------
+  build-web:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # Permissão necessária para criar a Release no GitHub
-
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v4
@@ -42,28 +42,215 @@ jobs:
       - name: Build da Aplicação PWA
         run: npm run build
 
-      # --- ETAPA DE EMPACOTAMENTO DA APLICAÇÃO ---
       - name: Gerar Pacotes .pk e .rxe
         run: |
           echo "Empacotando build do PWA em formatos .pk e .rxe..."
-
-          # Pacote .pk: assets estáticos do PWA
           tar -czf app-release.pk -C .next/static .
-
-          # Pacote .rxe: build completo da aplicação
           zip -r app-release.rxe .next/
 
-          # Checksum SHA256 para verificação de integridade
-          sha256sum app-release.pk app-release.rxe > SHA256SUMS.txt
+      - name: Upload pacotes web
+        uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: |
+            app-release.pk
+            app-release.rxe
 
-      # --- ETAPA DE CRIAÇÃO DO RELEASE NO GITHUB ---
+  # ---------------------------------------------------------------
+  # Android: UI exportada (out/) + dados locais via sqlite do device
+  # ---------------------------------------------------------------
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Instalar Dependências
+        run: npm ci
+
+      - name: Build estático para webview
+        run: npm run build:mobile
+
+      - name: Sincronizar Capacitor (Android)
+        run: |
+          npx cap add android
+          npx cap sync android
+
+      - name: Build APK (debug, unsigned)
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      # --- Assinatura de release (descomente após configurar secrets) ---
+      # - name: Decode keystore
+      #   run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/keystore.jks
+      # - name: Build APK assinado
+      #   run: cd android && ./gradlew assembleRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+  # ---------------------------------------------------------------
+  # iOS: UI exportada + dados locais (unsigned — .ipa precisa de certs)
+  # ---------------------------------------------------------------
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Instalar Dependências
+        run: npm ci
+
+      - name: Build estático para webview
+        run: npm run build:mobile
+
+      - name: Sincronizar Capacitor (iOS)
+        run: |
+          npx cap add ios
+          npx cap sync ios
+
+      - name: Build iOS (unsigned, simulator)
+        run: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+          mkdir -p "$GITHUB_WORKSPACE/ios-artifact"
+          cp -R "build/Build/Products/Debug-iphonesimulator/App.app" \
+            "$GITHUB_WORKSPACE/ios-artifact/LinguaPersona.app"
+
+      # --- Assinatura .ipa (descomente após configurar secrets Apple) ---
+
+      - name: Upload app iOS
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          path: ios-artifact/LinguaPersona.app
+
+  # ---------------------------------------------------------------
+  # Desktop: Tauri + sidecar Node (app 100% local, localhost:3111)
+  # ---------------------------------------------------------------
+  build-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Deps Linux (webkit2gtk)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev \
+            librsvg2-dev patchelf
+
+      - name: Instalar Dependências
+        run: npm ci
+
+      - name: Restaurar engines do Prisma
+        run: npm rebuild @prisma/engines esbuild
+
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+
+      - name: Build standalone do servidor
+        run: |
+          npm run build
+          npm run build:standalone
+
+      - name: Preparar resources do sidecar
+        run: |
+          mkdir -p src-tauri/resources/server
+          cp -R .next/standalone src-tauri/resources/server/
+
+      - name: Baixar binário Node (sidecar)
+        run: npm run sidecar:bin
+
+      - name: Gerar ícones do app
+        run: npx tauri icon public/icons/icon-512.png
+
+      # --- Signing (descomente após configurar secrets) ---
+      # TAURI_SIGNING_PRIVATE_KEY / TAURI_SIGNING_PRIVATE_KEY_PASSWORD: updater
+      # APPLE_CERTIFICATE / APPLE_SIGNING_IDENTITY: macOS
+      # Certificado Authenticode: Windows
+
+      - name: Build Tauri bundles
+        run: npx tauri build
+
+      - name: Upload artefatos desktop
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}
+          path: |
+            src-tauri/target/release/bundle/
+            src-tauri/target/release/*.exe
+            src-tauri/target/release/linguapersona
+          if-no-files-found: warn
+
+  # ---------------------------------------------------------------
+  # Release: agrega todos os artefatos + checksum
+  # ---------------------------------------------------------------
+  release:
+    needs: [build-web, build-android, build-ios, build-desktop]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Permissão necessária para criar a Release no GitHub
+    steps:
+      - name: Baixar todos os artefatos
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*"
+          merge-multiple: true
+          path: dist
+
+      - name: Gerar SHA256SUMS
+        run: |
+          cd dist
+          find . -type f ! -name "SHA256SUMS.txt" -exec sha256sum {} + > SHA256SUMS.txt
+          find . -type f | sort
+
       - name: Criar Release e Anexar Binários
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            app-release.pk
-            app-release.rxe
-            SHA256SUMS.txt
+          files: dist/**
           draft: false
           prerelease: false
           generate_release_notes: true
