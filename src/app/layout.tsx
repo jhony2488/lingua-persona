@@ -65,7 +65,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </nav>
           </header>
           <div className="flex-1">{children}</div>
-          <footer className="border-t py-4 text-center text-xs text-muted-foreground">
+          <footer className="text-muted-foreground border-t py-4 text-center text-xs">
             LinguaPersona — learn English with a local AI teacher
           </footer>
           <InstallBanner />

@@ -118,7 +118,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between rounded-md border p-3">
             <div>
               <p className="text-sm font-medium">Notifications</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Web Push support is prepared; permission state: {permission}
               </p>
             </div>
@@ -126,7 +126,9 @@ export default function SettingsPage() {
               variant="outline"
               size="sm"
               disabled={permission === "unsupported"}
-              onClick={async () => setPermission(await requestNotificationPermission())}
+              onClick={async () =>
+                setPermission(await requestNotificationPermission())
+              }
             >
               Enable
             </Button>
