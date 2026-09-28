@@ -6,11 +6,33 @@ O LinguaPersona suporta busca semântica 100% no lado do cliente para livros loc
 
 | Funcionalidade           | Livros locais (pré-instalados)                       | Livros por upload (usuário)                            |
 | ------------------------ | ---------------------------------------------------- | ------------------------------------------------------ |
-| Origem dos dados         | Diretório estático do app (`/assets/books`)          | Arquivo selecionado no dispositivo (PDF, EPUB, TXT)    |
+| Origem dos dados         | `data/library/` (corpus commitado, ver abaixo)       | Arquivo selecionado no dispositivo (PDF, EPUB, TXT)    |
 | Pré-processamento        | Pré-vetorizado no build ou gerado no primeiro acesso | Vetorizado em tempo de execução no navegador           |
 | Armazenamento de vetores | Cache local ou banco vetorial estático empacotado    | IndexedDB do navegador                                 |
 | Privacidade              | Totalmente privada e offline                         | Totalmente privada; o arquivo nunca sai do dispositivo |
 | Integração com IA        | Disponível para consultas imediatas                  | Disponível na sessão como material complementar        |
+
+### Corpus incluso (`data/library/`)
+
+Corpus de domínio público (Project Gutenberg) organizado em `manifest.json`
+com dois tipos por nível CEFR sugerido:
+
+- **`type: "study"`** — materiais de estudo/referência (gramática, exercícios,
+  vocabulário): Graded Lessons in English, How to Speak and Write Correctly,
+  Practical Exercises in English, Advanced English Grammar with Exercises,
+  The Grammar of English Grammars, Fifteen Thousand Useful Phrases,
+  Roget's Thesaurus.
+- **`type: "reading"`** — leitura por nível (Alice in Wonderland, Wizard of Oz,
+  Tom Sawyer, Christmas Carol, Time Machine, Frankenstein, Pride and Prejudice,
+  Jane Eyre, Moby Dick).
+
+Para re-baixar ou atualizar o corpus: `npm run fetch:books` (valida título de
+cada arquivo baixado). Material de nível A1–A2 (graded readers modernos) é
+protegido por copyright e não pode ser empacotado — o professor cobre esses
+níveis com exercícios gerados.
+
+> **Nota para o pipeline**: textos do Gutenberg têm cabeçalho/rodapé legais —
+> o chunking deve removê-los (marcadores `*** START OF`/`*** END OF`).
 
 ## Fluxo de processamento e indexação
 

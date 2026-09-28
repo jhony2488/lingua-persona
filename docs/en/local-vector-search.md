@@ -6,11 +6,33 @@ LinguaPersona supports 100% client-side semantic search for local books and user
 
 | Feature        | Local books (pre-installed)                               | User uploads                                       |
 | -------------- | --------------------------------------------------------- | -------------------------------------------------- |
-| Data origin    | App static directory (`/assets/books`)                    | File selected on the device (PDF, EPUB, TXT)       |
+| Data origin    | `data/library/` (committed corpus, see below)             | File selected on the device (PDF, EPUB, TXT)       |
 | Pre-processing | Pre-vectorized at build time or generated on first access | Vectorized at runtime in the browser               |
 | Vector storage | Local cache or packaged static vector database            | Browser IndexedDB                                  |
 | Privacy        | Fully private and offline                                 | Fully private; the file never leaves the device    |
 | AI integration | Available for immediate queries                           | Available in the session as supplementary material |
+
+### Bundled corpus (`data/library/`)
+
+Public-domain corpus (Project Gutenberg) organized in `manifest.json` with
+two types per suggested CEFR level:
+
+- **`type: "study"`** — study/reference materials (grammar, exercises,
+  vocabulary): Graded Lessons in English, How to Speak and Write Correctly,
+  Practical Exercises in English, Advanced English Grammar with Exercises,
+  The Grammar of English Grammars, Fifteen Thousand Useful Phrases,
+  Roget's Thesaurus.
+- **`type: "reading"`** — graded reading (Alice in Wonderland, Wizard of Oz,
+  Tom Sawyer, Christmas Carol, Time Machine, Frankenstein, Pride and
+  Prejudice, Jane Eyre, Moby Dick).
+
+To re-download or update the corpus: `npm run fetch:books` (validates each
+downloaded file's title). A1–A2 level material (modern graded readers) is
+copyright-protected and cannot be bundled — the teacher covers those levels
+with generated exercises.
+
+> **Pipeline note**: Gutenberg texts include legal headers/footers —
+> the chunker should strip them (`*** START OF`/`*** END OF` markers).
 
 ## Processing and indexing flow
 
