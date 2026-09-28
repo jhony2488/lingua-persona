@@ -8,11 +8,13 @@ const stashDir = join(root, ".next-mobile-stash");
 const stashed = [
   join(root, "src", "app", "api"),
   join(root, "src", "app", "serwist"),
+  join(root, "src", "proxy.ts"),
 ];
 
-// Route Handlers quebram `output: "export"`. Para o build mobile,
-// movemos api/ e serwist/ para um stash fora de src/, geramos out/
-// e restauramos em finally — a UI nativa usa a camada local sqlite.
+// Route Handlers e Proxy quebram `output: "export"`. Para o build mobile,
+// movemos api/, serwist/ e proxy.ts para um stash fora de src/, geramos
+// out/ e restauramos em finally — a UI nativa usa a camada local sqlite
+// e a rota "/" (route group (index)) faz o redirect de locale no cliente.
 mkdirSync(stashDir, { recursive: true });
 
 try {
