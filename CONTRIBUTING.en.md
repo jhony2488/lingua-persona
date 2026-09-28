@@ -41,14 +41,23 @@ Thank you for helping build LinguaPersona. Before opening an issue or pull reque
   npm run lint
   npm run test
   ```
+- **Git hooks (Husky)**: `pre-commit` runs `npm run lint` and `pre-push` runs
+  `npm run test` — commits/pushes that fail the check are blocked.
+  Because `.npmrc` sets `ignore-scripts=true`, hooks are not installed
+  automatically after `npm install`; activate them once with:
+  ```bash
+  npx husky
+  ```
 - Keep components small and focused.
 - Prefer functions and hooks over classes.
 - Name files and folders in English for ecosystem consistency (e.g., `inferenceEngine.ts`, `useAgentStore.ts`).
 
 ## Tests
 
-- Whenever you add a new feature, add unit tests where it makes sense.
-- Tests must use **Jest** + **React Testing Library**.
+- **Every change must touch tests**: changes to existing behavior must update
+  the corresponding tests; new features must add new tests.
+- Tests must use **Jest** + **React Testing Library**; API tests use
+  **Supertest** with the mini-router in `__tests__/helpers/app.ts`.
 - Do not submit tests that depend on network or GPU.
 
 ## Pull Requests

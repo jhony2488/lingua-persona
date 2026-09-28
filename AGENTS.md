@@ -85,6 +85,10 @@ the sidecar on localhost. Shared pure logic (`plan-generator`, Zod schemas,
   `docs:`, `chore:`). SSH-signed.
 - **PRs**: max 20 changed files; larger only with strong justification in
   the PR body — prefer splitting into smaller deliveries.
+- **Tests**: every change must touch tests — update tests for modified
+  behavior, add tests for new features.
+- **Hooks**: Husky pre-commit runs `npm run lint`, pre-push runs
+  `npm run test`. With `ignore-scripts`, activate once via `npx husky`.
 - **Migrations**: never edit an applied `prisma/migrations/*` file — create a
   new migration. Mirror any schema change in `src/lib/local-db/schema.sql.ts`.
 - **API**: validate with Zod (`parseBody`/`parseQuery`/`parseParams`), throw
