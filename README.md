@@ -123,6 +123,7 @@ Os testes usam um banco SQLite separado (`prisma/test.db`), criado automaticamen
 - [Gênero do agente](docs/pt/genero-do-agente.md)
 - [PWA e distribuição](docs/pt/pwa-e-distribuicao.md)
 - [Modelos locais](docs/pt/modelos-locais.md)
+- [Guia de hardware e modelos](docs/pt/guia-de-hardware.md)
 - [Professor virtual](docs/pt/professor-virtual.md)
 - [Pesquisa vetorial local](docs/pt/pesquisa-vetorial-local.md)
 - [Configuração do `.npmrc`](docs/pt/npmrc.md)

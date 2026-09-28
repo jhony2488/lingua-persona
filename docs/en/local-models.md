@@ -62,4 +62,5 @@ The UI can offer:
 ## See also
 
 - [Inference engine](inference-engine.md)
+- [Hardware guide](hardware-guide.md)
 - [PWA and distribution](pwa-and-distribution.md)

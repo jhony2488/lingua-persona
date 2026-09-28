@@ -123,6 +123,7 @@ Tests use a separate SQLite database (`prisma/test.db`), created automatically â
 - [Agent gender](docs/en/agent-gender.md)
 - [PWA and distribution](docs/en/pwa-and-distribution.md)
 - [Local models](docs/en/local-models.md)
+- [Hardware and model guide](docs/en/hardware-guide.md)
 - [Virtual teacher](docs/en/virtual-teacher.md)
 - [Local vector search](docs/en/local-vector-search.md)
 - [`.npmrc` configuration](docs/en/npmrc.md)

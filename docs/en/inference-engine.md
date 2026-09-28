@@ -27,7 +27,7 @@ const engine = await CreateMLCEngine("Llama-3.2-1B-Instruct-q4f16_1-MLC", {
 
 ### Suggested models
 
-The model choice depends on VRAM and WebGPU support:
+The model choice depends on VRAM and WebGPU support. Smaller models keep good performance in this app because RAG injects the relevant context and structured system prompts narrow the task — see the [Hardware guide](hardware-guide.md) for detailed requirements and Ollama recommendations.
 
 | Model                               | Approximate size | Recommended use                               |
 | ----------------------------------- | ---------------- | --------------------------------------------- |
@@ -62,5 +62,6 @@ The fallback logic is transparent to the UI: the interface calls the same `gener
 
 ## See also
 
+- [Hardware guide](hardware-guide.md)
 - [Local models](local-models.md)
 - [PWA and distribution](pwa-and-distribution.md)

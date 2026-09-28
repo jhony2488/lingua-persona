@@ -62,4 +62,5 @@ A UI pode oferecer:
 ## Veja também
 
 - [Motor de inferência](motor-de-inferencia.md)
+- [Guia de hardware](guia-de-hardware.md)
 - [PWA e distribuição](pwa-e-distribuicao.md)

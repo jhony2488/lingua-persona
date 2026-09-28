@@ -27,7 +27,7 @@ const engine = await CreateMLCEngine("Llama-3.2-1B-Instruct-q4f16_1-MLC", {
 
 ### Modelos sugeridos
 
-A escolha do modelo depende da VRAM e do suporte a WebGPU do dispositivo:
+A escolha do modelo depende da VRAM e do suporte a WebGPU do dispositivo. Modelos menores mantêm boa performance neste app porque o RAG injeta o contexto relevante e os system prompts estruturados estreitam a tarefa — veja o [Guia de hardware](guia-de-hardware.md) para requisitos detalhados e recomendações para Ollama.
 
 | Modelo                              | Tamanho aproximado | Uso recomendado                         |
 | ----------------------------------- | ------------------ | --------------------------------------- |
@@ -62,5 +62,6 @@ A lógica de fallback é transparente para a UI: a interface chama o mesmo `gene
 
 ## Veja também
 
+- [Guia de hardware](guia-de-hardware.md)
 - [Modelos locais](modelos-locais.md)
 - [PWA e distribuição](pwa-e-distribuicao.md)
