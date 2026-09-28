@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { AppError } from "@/lib/errors";
 
-export async function parseBody<T>(req: Request, schema: z.ZodType<T>): Promise<T> {
+export async function parseBody<T>(
+  req: Request,
+  schema: z.ZodType<T>,
+): Promise<T> {
   const raw = await req.text();
   if (!raw.trim()) {
     throw AppError.badRequest("Request body is required");
