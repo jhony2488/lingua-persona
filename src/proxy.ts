@@ -25,6 +25,15 @@ function getLocale(request: NextRequest): Locale {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Landing institucional: LANDING_PAGE=1 serve "/" como página pública e
+  // oculta o app — quem usa baixa o release ou roda localmente.
+  if (process.env.LANDING_PAGE === "1") {
+    if (pathname === "/") return;
+    request.nextUrl.pathname = "/";
+    return NextResponse.redirect(request.nextUrl);
+  }
+
   const pathnameHasLocale = locales.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
   );
