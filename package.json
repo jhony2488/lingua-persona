@@ -9,7 +9,7 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
