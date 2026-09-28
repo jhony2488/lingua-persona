@@ -14,6 +14,19 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated artifacts:
+    "playwright-report/**",
+    "test-results/**",
+    ".next-mobile-stash/**",
+    ".sidecar-tmp/**",
+    "src-tauri/target/**",
+    "src-tauri/gen/**",
+    "src-tauri/binaries/**",
+    "src-tauri/resources/**",
+    "data/library/*.txt",
+    "standalone-*.log",
+    "dev-*.log",
+    "debug-*.cjs",
   ]),
 ]);
 

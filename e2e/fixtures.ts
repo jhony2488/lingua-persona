@@ -20,6 +20,7 @@ export const test = base.extend<E2EFixtures>({
       },
     });
     const user = (await res.json()) as { id: string };
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- Playwright fixture API
     await use(user.id);
     await request.delete(`/api/users/${user.id}`).catch(() => {});
   },
