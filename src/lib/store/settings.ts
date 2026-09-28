@@ -6,6 +6,8 @@ import { persist } from "zustand/middleware";
 export type Dialect = "US" | "UK";
 export type EnglishLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 export type AgentGender = "male" | "female";
+export type ChatMode = "chat" | "voice";
+export type VoiceFlow = "auto" | "confirm";
 
 interface SettingsState {
   userId: string | null;
@@ -13,11 +15,15 @@ interface SettingsState {
   level: EnglishLevel;
   agentName: string;
   agentGender: AgentGender;
+  chatMode: ChatMode;
+  voiceFlow: VoiceFlow;
   setUserId: (userId: string | null) => void;
   setDialect: (dialect: Dialect) => void;
   setLevel: (level: EnglishLevel) => void;
   setAgentName: (name: string) => void;
   setAgentGender: (gender: AgentGender) => void;
+  setChatMode: (mode: ChatMode) => void;
+  setVoiceFlow: (flow: VoiceFlow) => void;
 }
 
 export const useSettings = create<SettingsState>()(
@@ -28,11 +34,15 @@ export const useSettings = create<SettingsState>()(
       level: "A1",
       agentName: "Alex",
       agentGender: "male",
+      chatMode: "chat",
+      voiceFlow: "auto",
       setUserId: (userId) => set({ userId }),
       setDialect: (dialect) => set({ dialect }),
       setLevel: (level) => set({ level }),
       setAgentName: (agentName) => set({ agentName }),
       setAgentGender: (agentGender) => set({ agentGender }),
+      setChatMode: (chatMode) => set({ chatMode }),
+      setVoiceFlow: (voiceFlow) => set({ voiceFlow }),
     }),
     { name: "linguapersona-settings" },
   ),

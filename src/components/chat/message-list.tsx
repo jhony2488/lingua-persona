@@ -4,16 +4,9 @@ import type { Message } from "@prisma/client";
 import { Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { Dialect } from "@/lib/store/settings";
+import { speak } from "@/lib/speech";
+import { useSettings, type Dialect } from "@/lib/store/settings";
 import { cn } from "@/lib/utils";
-
-function speak(text: string, dialect: Dialect) {
-  if (!("speechSynthesis" in window)) return;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = dialect === "UK" ? "en-GB" : "en-US";
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utterance);
-}
 
 interface MessageListProps {
   messages: Message[];
@@ -22,6 +15,7 @@ interface MessageListProps {
 }
 
 export function MessageList({ messages, dialect, pending }: MessageListProps) {
+  const agentGender = useSettings((s) => s.agentGender);
   if (messages.length === 0 && !pending) {
     return (
       <div className="text-muted-foreground flex flex-1 items-center justify-center text-sm">
@@ -49,7 +43,9 @@ export function MessageList({ messages, dialect, pending }: MessageListProps) {
                 variant="ghost"
                 size="icon"
                 className="size-6 shrink-0"
-                onClick={() => speak(message.content, dialect)}
+                onClick={() =>
+                  speak(message.content, { dialect, gender: agentGender })
+                }
                 aria-label="Play message"
               >
                 <Volume2 className="size-3" />

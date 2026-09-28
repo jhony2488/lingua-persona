@@ -3,39 +3,12 @@
 import { Mic, MicOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  createSpeechRecognition,
+  speechLang,
+  type SpeechRecognitionLike,
+} from "@/lib/speech";
 import type { Dialect } from "@/lib/store/settings";
-
-interface SpeechRecognitionResultItem {
-  transcript: string;
-}
-
-interface SpeechRecognitionEventLike {
-  resultIndex: number;
-  results: ArrayLike<{ isFinal: boolean; 0: SpeechRecognitionResultItem }>;
-}
-
-interface SpeechRecognitionLike {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
-  onend: (() => void) | null;
-  onerror: (() => void) | null;
-  start(): void;
-  stop(): void;
-}
-
-type RecognitionCtor = new () => SpeechRecognitionLike;
-
-function getRecognition(): SpeechRecognitionLike | null {
-  if (typeof window === "undefined") return null;
-  const w = window as unknown as {
-    SpeechRecognition?: RecognitionCtor;
-    webkitSpeechRecognition?: RecognitionCtor;
-  };
-  const Ctor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
-  return Ctor ? new Ctor() : null;
-}
 
 const SILENCE_TIMEOUT_MS = 10_000;
 
@@ -80,13 +53,13 @@ export function VoiceButton({
       return;
     }
 
-    const recognition = getRecognition();
+    const recognition = createSpeechRecognition();
     if (!recognition) {
       setSupported(false);
       return;
     }
 
-    recognition.lang = dialect === "UK" ? "en-GB" : "en-US";
+    recognition.lang = speechLang(dialect);
     recognition.continuous = true;
     recognition.interimResults = true;
 

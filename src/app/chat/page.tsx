@@ -1,20 +1,25 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { AudioLines, MessageSquare } from "lucide-react";
+import { useState, type ComponentType } from "react";
 import { ConversationList } from "@/components/chat/conversation-list";
 import { MessageInput } from "@/components/chat/message-input";
 import { MessageList } from "@/components/chat/message-list";
 import { OnboardingDialog } from "@/components/chat/onboarding-dialog";
 import { TopicChips } from "@/components/chat/topic-chips";
+import { VoiceMode } from "@/components/chat/voice-mode";
 import { Card } from "@/components/ui/card";
 import { api } from "@/lib/api-client";
-import { useSettings } from "@/lib/store/settings";
+import { useSettings, type ChatMode } from "@/lib/store/settings";
+import { cn } from "@/lib/utils";
 
 export default function ChatPage() {
   const userId = useSettings((state) => state.userId);
   const dialect = useSettings((state) => state.dialect);
   const level = useSettings((state) => state.level);
+  const chatMode = useSettings((state) => state.chatMode);
+  const setChatMode = useSettings((state) => state.setChatMode);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
@@ -58,7 +63,11 @@ export default function ChatPage() {
         <ConversationList selectedId={selectedId} onSelect={setSelectedId} />
 
         <Card className="flex min-h-[60vh] flex-1 flex-col overflow-hidden">
-          {!selectedId ? (
+          <div className="flex items-center justify-end border-b px-3 py-2">
+            <ModeToggle mode={chatMode} onChange={setChatMode} />
+          </div>
+
+          {!selectedId && chatMode === "chat" ? (
             <div className="text-muted-foreground flex flex-1 flex-col items-center justify-center gap-4 p-6 text-sm">
               <p>Pick a conversation or create a new one.</p>
               {userId && (
@@ -68,6 +77,16 @@ export default function ChatPage() {
                 />
               )}
             </div>
+          ) : chatMode === "voice" ? (
+            <VoiceMode
+              key={selectedId ?? "none"}
+              selectedId={selectedId}
+              messages={messages}
+              conversations={conversations}
+              pending={sendMutation.isPending}
+              onSend={(content) => sendMutation.mutateAsync(content)}
+              onSelectTopic={(topic) => topicMutation.mutate(topic)}
+            />
           ) : (
             <>
               <MessageList
@@ -86,5 +105,43 @@ export default function ChatPage() {
         </Card>
       </div>
     </main>
+  );
+}
+
+function ModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: ChatMode;
+  onChange: (mode: ChatMode) => void;
+}) {
+  const options: {
+    value: ChatMode;
+    label: string;
+    icon: ComponentType<{ className?: string }>;
+  }[] = [
+    { value: "voice", label: "Voice", icon: AudioLines },
+    { value: "chat", label: "Chat", icon: MessageSquare },
+  ];
+  return (
+    <div className="flex rounded-md border text-xs">
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          onClick={() => onChange(option.value)}
+          aria-pressed={mode === option.value}
+          className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5 transition-colors",
+            mode === option.value
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-accent",
+          )}
+        >
+          <option.icon className="size-3.5" />
+          {option.label}
+        </button>
+      ))}
+    </div>
   );
 }
