@@ -62,6 +62,9 @@ Thank you for helping build LinguaPersona. Before opening an issue or pull reque
   the corresponding tests; new features must add new tests.
 - Tests must use **Jest** + **React Testing Library**; API tests use
   **Supertest** with the mini-router in `__tests__/helpers/app.ts`.
+- End-to-end tests use **Playwright** (`npm run test:e2e`) with Gherkin
+  scenarios in `e2e/features/` — they run in CI, so `pre-push` does not
+  need to pass them.
 - Do not submit tests that depend on network or GPU.
 
 ## Pull Requests

@@ -41,7 +41,7 @@ Mesmo sem experiência com programação, você consegue rodar o projeto seguind
 
 ### Pré-requisitos
 
-- **Node.js 20 ou superior** — baixe a versão LTS em [nodejs.org](https://nodejs.org). Para conferir se já está instalado, abra o terminal e rode `node --version`.
+- **Node.js 22 ou superior** — baixe a versão LTS em [nodejs.org](https://nodejs.org). Para conferir se já está instalado, abra o terminal e rode `node --version`.
 - **Git** — baixe em [git-scm.com](https://git-scm.com). Verifique com `git --version`.
 
 ### Passo a passo
@@ -128,6 +128,8 @@ Os testes usam um banco SQLite separado (`prisma/test.db`), criado automaticamen
 - [Pesquisa vetorial local](docs/pt/pesquisa-vetorial-local.md)
 - [Configuração do `.npmrc`](docs/pt/npmrc.md)
 - [Assinatura SSH para commits](docs/pt/assinatura-ssh.md)
+- [Diretivas de ignore](docs/pt/diretivas-de-ignore.md)
+- [Testes](docs/pt/testes.md)
 - [Como contribuir](CONTRIBUTING.md)
 
 Para a versão em inglês, veja [README.en.md](README.en.md) e [docs/en/](docs/en/).

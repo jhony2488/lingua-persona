@@ -37,6 +37,17 @@ Define como o professor se comporta.
 5. A resposta é exibida em texto e, opcionalmente, lida em voz alta.
 6. O sistema salva erros e novas palavras para uso futuro.
 
+## Plataforma e codebase
+
+A aplicação é Next.js (App Router) com rotas localizadas e persistência por plataforma:
+
+- **Rotas localizadas**: `src/app/[lang]/` (chat, plan, settings, `~offline`) — `src/proxy.ts` negocia o locale via header/cookie; dicionários em `src/i18n/`.
+- **API**: Route Handlers em `src/app/api/` (não localizados), dominíos em `src/modules/<dominio>/` (`schema.ts` Zod + `service.ts` + `repository.ts`).
+- **Web/dev**: Prisma + `prisma/dev.db`.
+- **Desktop (Tauri)**: mesmo backend como sidecar Node standalone (`127.0.0.1:3111`), SQLite no `appDataDir`.
+- **Mobile (Capacitor)**: sem servidor — `src/lib/local-db/` fala direto com `@capacitor-community/sqlite`; `api-client` escolhe o caminho por `Capacitor.isNativePlatform()`.
+- **Corpus**: livros de domínio público em `data/library/` (`manifest.json` + `.txt`), baixados por `npm run fetch:books`.
+
 ## Veja também
 
 - [Motor de inferência](motor-de-inferencia.md)
@@ -44,3 +55,5 @@ Define como o professor se comporta.
 - [Pedagogia e prompts](pedagogia-e-prompts.md)
 - [Professor virtual](professor-virtual.md)
 - [Pesquisa vetorial local](pesquisa-vetorial-local.md)
+- [PWA e distribuição](pwa-e-distribuicao.md)
+- [Testes](testes.md)

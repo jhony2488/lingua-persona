@@ -37,6 +37,17 @@ Defines how the teacher behaves.
 5. The response is shown as text and, optionally, read aloud.
 6. The system saves errors and new words for future use.
 
+## Platform and codebase
+
+The app is Next.js (App Router) with localized routes and per-platform persistence:
+
+- **Localized routes**: `src/app/[lang]/` (chat, plan, settings, `~offline`) — `src/proxy.ts` negotiates the locale via header/cookie; dictionaries live in `src/i18n/`.
+- **API**: Route Handlers in `src/app/api/` (not localized), domains in `src/modules/<domain>/` (`schema.ts` Zod + `service.ts` + `repository.ts`).
+- **Web/dev**: Prisma + `prisma/dev.db`.
+- **Desktop (Tauri)**: same backend as a standalone Node sidecar (`127.0.0.1:3111`), SQLite in `appDataDir`.
+- **Mobile (Capacitor)**: no server — `src/lib/local-db/` talks directly to `@capacitor-community/sqlite`; `api-client` picks the path via `Capacitor.isNativePlatform()`.
+- **Corpus**: public-domain books in `data/library/` (`manifest.json` + `.txt`), fetched by `npm run fetch:books`.
+
 ## See also
 
 - [Inference engine](inference-engine.md)
@@ -44,3 +55,5 @@ Defines how the teacher behaves.
 - [Pedagogy and prompts](pedagogy-and-prompts.md)
 - [Virtual teacher](virtual-teacher.md)
 - [Local vector search](local-vector-search.md)
+- [PWA and distribution](pwa-and-distribution.md)
+- [Testing](testing.md)

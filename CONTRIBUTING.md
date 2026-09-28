@@ -63,6 +63,9 @@ Obrigado por querer ajudar a construir o LinguaPersona. Antes de abrir uma issue
   adicionar testes novos.
 - Testes devem usar **Jest** + **React Testing Library**; testes de API usam
   **Supertest** com o mini-router em `__tests__/helpers/app.ts`.
+- Testes end-to-end usam **Playwright** (`npm run test:e2e`) com cenários em
+  Gherkin em `e2e/features/` — eles rodam no CI, então não precisam passar
+  no `pre-push`.
 - Não envie testes dependentes de rede ou GPU.
 
 ## Pull Requests

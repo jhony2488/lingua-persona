@@ -31,6 +31,8 @@ SQLite. No external server required for native builds.
 npm run dev               # dev server (port 3000)
 npm run build             # standalone production build → .next/standalone
 npm run test              # jest --runInBand (uses isolated prisma/test.db)
+npm run test:e2e          # playwright — starts next dev, hits real API + dev.db
+npm run test:e2e:ui       # playwright UI mode
 npm run lint && npm run format:check
 npx tsc --noEmit
 
@@ -64,6 +66,8 @@ src-tauri/                Rust shell: spawns Node sidecar on 127.0.0.1:3111
 data/library/             bundled corpus — manifest.json + downloaded .txt
 scripts/                  build-mobile, build-standalone, fetch-node-bin, fetch-books
 __tests__/                unit/ + integration/ + helpers/ (supertest mini-router)
+e2e/                      playwright specs + fixtures.ts (seedProfile, goto)
+e2e/features/             Gherkin em pt-BR mapeado 1:1 para os specs
 ```
 
 ## Architecture: data per platform
@@ -86,7 +90,9 @@ the sidecar on localhost. Shared pure logic (`plan-generator`, Zod schemas,
 - **PRs**: max 20 changed files; larger only with strong justification in
   the PR body — prefer splitting into smaller deliveries.
 - **Tests**: every change must touch tests — update tests for modified
-  behavior, add tests for new features.
+  behavior, add tests for new features. E2E: add a scenario to
+  `e2e/features/*.feature` + spec in `e2e/`; specs seed users via real API
+  and share dev.db — keep them isolated per user.
 - **Ignore directives**: `eslint-disable`/`@ts-ignore`/`@ts-expect-error`/
   `@ts-nocheck` only in test files (`__tests__/`, `e2e/`, `jest.env.ts`);
   fix the cause in production code.
@@ -120,6 +126,7 @@ the sidecar on localhost. Shared pure logic (`plan-generator`, Zod schemas,
 | PWA & distribution               | [pwa-e-distribuicao.md](docs/pt/pwa-e-distribuicao.md)           | [pwa-and-distribution.md](docs/en/pwa-and-distribution.md) |
 | `.npmrc` security                | [npmrc.md](docs/pt/npmrc.md)                                     | [npmrc.md](docs/en/npmrc.md)                               |
 | SSH commit signing               | [assinatura-ssh.md](docs/pt/assinatura-ssh.md)                   | [ssh-signing.md](docs/en/ssh-signing.md)                   |
+| Testing (jest + e2e)             | [testes.md](docs/pt/testes.md)                                   | [testing.md](docs/en/testing.md)                           |
 | Ignore directives                | [diretivas-de-ignore.md](docs/pt/diretivas-de-ignore.md)         | [ignore-directives.md](docs/en/ignore-directives.md)       |
 
 See also: `README.md` / `README.en.md`, `CONTRIBUTING.md` /
@@ -127,6 +134,11 @@ See also: `README.md` / `README.en.md`, `CONTRIBUTING.md` /
 
 ## Gotchas
 
+- **Hydration races in e2e**: always `goto(page, ...)` (waits networkidle)
+  before interacting; never raw `page.goto` in specs.
+- **Base UI `data-closed` elements can linger**: dialog overlay keeps
+  `data-closed:hidden` — if a closed overlay blocks clicks, check its
+  pointer-events/display in the closed state.
 - **`prisma generate` EPERM on Windows**: a running dev server locks
   `query_engine-windows.dll.node`. Stop `npm run dev`, run generate, restart.
 - **Stale IDE Prisma errors** (`has no exported member 'User'`): restart the

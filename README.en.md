@@ -41,7 +41,7 @@ Even without programming experience, you can run the project by following the st
 
 ### Prerequisites
 
-- **Node.js 20 or newer** — download the LTS version at [nodejs.org](https://nodejs.org). To check if it's already installed, open a terminal and run `node --version`.
+- **Node.js 22 or newer** — download the LTS version at [nodejs.org](https://nodejs.org). To check if it's already installed, open a terminal and run `node --version`.
 - **Git** — download at [git-scm.com](https://git-scm.com). Verify with `git --version`.
 
 ### Step by step
@@ -128,6 +128,8 @@ Tests use a separate SQLite database (`prisma/test.db`), created automatically �
 - [Local vector search](docs/en/local-vector-search.md)
 - [`.npmrc` configuration](docs/en/npmrc.md)
 - [SSH signing for commits](docs/en/ssh-signing.md)
+- [Ignore directives](docs/en/ignore-directives.md)
+- [Testing](docs/en/testing.md)
 - [How to contribute](CONTRIBUTING.en.md)
 
 For the Portuguese version, see [README.md](README.md) and [docs/pt/](docs/pt/).

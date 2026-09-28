@@ -48,7 +48,7 @@ Estratégias de cache em `sw.ts`:
 
 Dois workflows em `.github/workflows/`:
 
-- `ci.yml` — lint, format:check, testes e build em push/PR para `master`
+- `ci.yml` — lint, format:check, testes (Jest) e build em push/PR para `master`, mais job `e2e` com Playwright contra `next dev`
 - `release.yml` — em tags `v*.*.*`:
   - **web**: `.pk` (static) + `.rxe` (.next)
   - **android**: `build:mobile` → `cap sync` → `app-debug.apk`
