@@ -1,0 +1,165 @@
+{
+  "description": "Curated public-domain English corpus: reading books + study/reference (grammar, vocabulary, writing) mapped to suggested CEFR levels. Levels are approximate, not rigorous.",
+  "books": [
+    {
+      "id": "gutenberg-7185",
+      "title": "Graded Lessons in English",
+      "author": "Alonzo Reed and Brainerd Kellogg",
+      "type": "study",
+      "level": "B1",
+      "slug": "graded-lessons-english",
+      "titleHint": "Graded Lessons",
+      "url": "https://www.gutenberg.org/cache/epub/7010/pg7010.txt"
+    },
+    {
+      "id": "gutenberg-6409",
+      "title": "How to Speak and Write Correctly",
+      "author": "Joseph Devlin",
+      "type": "study",
+      "level": "B1",
+      "slug": "speak-write-correctly",
+      "titleHint": "Speak and Write Correctly",
+      "url": "https://www.gutenberg.org/cache/epub/6409/pg6409.txt"
+    },
+    {
+      "id": "gutenberg-22577",
+      "title": "Practical Exercises in English",
+      "author": "Huber Gray Buehler",
+      "type": "study",
+      "level": "B2",
+      "slug": "practical-exercises-english",
+      "titleHint": "Practical Exercises",
+      "url": "https://www.gutenberg.org/cache/epub/22577/pg22577.txt"
+    },
+    {
+      "id": "gutenberg-45814",
+      "title": "An Advanced English Grammar with Exercises",
+      "author": "George Lyman Kittredge and Frank Edgar Farley",
+      "type": "study",
+      "level": "C1",
+      "slug": "advanced-english-grammar",
+      "titleHint": "Advanced English Grammar",
+      "url": "https://www.gutenberg.org/cache/epub/45814/pg45814.txt"
+    },
+    {
+      "id": "gutenberg-11615",
+      "title": "The Grammar of English Grammars",
+      "author": "Goold Brown",
+      "type": "study",
+      "level": "C2",
+      "slug": "grammar-english-grammars",
+      "titleHint": "Grammar of English Grammars",
+      "url": "https://www.gutenberg.org/cache/epub/11615/pg11615.txt"
+    },
+    {
+      "id": "gutenberg-18362",
+      "title": "Fifteen Thousand Useful Phrases",
+      "author": "Grenville Kleiser",
+      "type": "study",
+      "level": "C1",
+      "slug": "fifteen-thousand-phrases",
+      "titleHint": "Useful Phrases",
+      "url": "https://www.gutenberg.org/cache/epub/18362/pg18362.txt"
+    },
+    {
+      "id": "gutenberg-22",
+      "title": "Roget's Thesaurus of English Words and Phrases",
+      "author": "Peter Mark Roget",
+      "type": "study",
+      "level": "C2",
+      "slug": "rogets-thesaurus",
+      "titleHint": "Thesaurus",
+      "url": "https://www.gutenberg.org/cache/epub/22/pg22.txt"
+    },
+    {
+      "id": "gutenberg-11",
+      "title": "Alice's Adventures in Wonderland",
+      "author": "Lewis Carroll",
+      "type": "reading",
+      "level": "B1",
+      "slug": "alice-wonderland",
+      "titleHint": "Wonderland",
+      "url": "https://www.gutenberg.org/cache/epub/11/pg11.txt"
+    },
+    {
+      "id": "gutenberg-55",
+      "title": "The Wonderful Wizard of Oz",
+      "author": "L. Frank Baum",
+      "type": "reading",
+      "level": "B1",
+      "slug": "wizard-of-oz",
+      "titleHint": "Wizard of Oz",
+      "url": "https://www.gutenberg.org/cache/epub/55/pg55.txt"
+    },
+    {
+      "id": "gutenberg-74",
+      "title": "The Adventures of Tom Sawyer",
+      "author": "Mark Twain",
+      "type": "reading",
+      "level": "B2",
+      "slug": "tom-sawyer",
+      "titleHint": "Tom Sawyer",
+      "url": "https://www.gutenberg.org/cache/epub/74/pg74.txt"
+    },
+    {
+      "id": "gutenberg-46",
+      "title": "A Christmas Carol",
+      "author": "Charles Dickens",
+      "type": "reading",
+      "level": "B2",
+      "slug": "christmas-carol",
+      "titleHint": "Christmas Carol",
+      "url": "https://www.gutenberg.org/cache/epub/46/pg46.txt"
+    },
+    {
+      "id": "gutenberg-35",
+      "title": "The Time Machine",
+      "author": "H. G. Wells",
+      "type": "reading",
+      "level": "B2",
+      "slug": "time-machine",
+      "titleHint": "Time Machine",
+      "url": "https://www.gutenberg.org/cache/epub/35/pg35.txt"
+    },
+    {
+      "id": "gutenberg-84",
+      "title": "Frankenstein",
+      "author": "Mary Wollstonecraft Shelley",
+      "type": "reading",
+      "level": "C1",
+      "slug": "frankenstein",
+      "titleHint": "Frankenstein",
+      "url": "https://www.gutenberg.org/cache/epub/84/pg84.txt"
+    },
+    {
+      "id": "gutenberg-1342",
+      "title": "Pride and Prejudice",
+      "author": "Jane Austen",
+      "type": "reading",
+      "level": "C1",
+      "slug": "pride-and-prejudice",
+      "titleHint": "Pride and Prejudice",
+      "url": "https://www.gutenberg.org/cache/epub/1342/pg1342.txt"
+    },
+    {
+      "id": "gutenberg-1260",
+      "title": "Jane Eyre",
+      "author": "Charlotte Brontë",
+      "type": "reading",
+      "level": "C1",
+      "slug": "jane-eyre",
+      "titleHint": "Jane Eyre",
+      "url": "https://www.gutenberg.org/cache/epub/1260/pg1260.txt"
+    },
+    {
+      "id": "gutenberg-2701",
+      "title": "Moby Dick; or, The Whale",
+      "author": "Herman Melville",
+      "type": "reading",
+      "level": "C2",
+      "slug": "moby-dick",
+      "titleHint": "Moby Dick",
+      "url": "https://www.gutenberg.org/cache/epub/2701/pg2701.txt"
+    }
+  ]
+}

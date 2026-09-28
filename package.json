@@ -16,6 +16,7 @@
     "db:migrate": "prisma migrate dev",
     "mobile:sync": "cap sync",
     "build:mobile": "node scripts/build-mobile.mjs",
+    "fetch:books": "node scripts/fetch-books.mjs",
     "build:standalone": "node scripts/build-standalone.mjs",
     "sidecar:bin": "node scripts/fetch-node-bin.mjs",
     "tauri": "tauri"
