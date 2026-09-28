@@ -34,6 +34,8 @@ export async function seedProfile(
 ) {
   await page.addInitScript(
     ({ key, id, extra }) => {
+      // Só semeia se ainda não houver store — reloads preservam alterações.
+      if (localStorage.getItem(key)) return;
       localStorage.setItem(
         key,
         JSON.stringify({
@@ -53,6 +55,15 @@ export async function seedProfile(
     },
     { key: SETTINGS_KEY, id: userId, extra: overrides },
   );
+}
+
+/** goto + espera networkidle — evita cliques/fills revertidos pela hidratação. */
+export async function goto(
+  page: import("@playwright/test").Page,
+  url: string,
+) {
+  await page.goto(url);
+  await page.waitForLoadState("networkidle");
 }
 
 export const urls = {

@@ -1,8 +1,8 @@
-import { test, expect, urls, seedProfile } from "./fixtures";
+import { test, expect, urls, seedProfile, goto } from "./fixtures";
 
 test.describe("Study plan", () => {
   test("visitor without profile sees onboarding CTA", async ({ page }) => {
-    await page.goto(urls.plan);
+    await goto(page, urls.plan);
     await expect(
       page.getByText("Create your teacher profile first"),
     ).toBeVisible();
@@ -13,7 +13,7 @@ test.describe("Study plan", () => {
 
   test("generates a 4-week plan", async ({ page, userId }) => {
     await seedProfile(page, userId);
-    await page.goto(urls.plan);
+    await goto(page, urls.plan);
 
     await page.getByLabel("Weeks").selectOption("4");
     await page.getByRole("button", { name: "Generate plan" }).click();
@@ -27,7 +27,7 @@ test.describe("Study plan", () => {
 
   test("speaking focus removes study references", async ({ page, userId }) => {
     await seedProfile(page, userId);
-    await page.goto(urls.plan);
+    await goto(page, urls.plan);
 
     await page.getByLabel("Focus").selectOption("speaking");
     await page.getByRole("button", { name: "Generate plan" }).click();
@@ -36,3 +36,4 @@ test.describe("Study plan", () => {
     await expect(page.getByText(/^Study:/)).toHaveCount(0);
   });
 });
+

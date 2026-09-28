@@ -1,4 +1,4 @@
-import { test, expect, urls } from "./fixtures";
+import { test, expect, urls, goto } from "./fixtures";
 
 test.describe("PWA", () => {
   test("manifest is served", async ({ page }) => {
@@ -10,9 +10,10 @@ test.describe("PWA", () => {
   });
 
   test("offline page renders", async ({ page }) => {
-    await page.goto(urls.offline);
+    await goto(page, urls.offline);
     await expect(page.getByText(/offline/i).first()).toBeVisible();
   });
 
   test.skip("install banner on beforeinstallprompt", async () => {});
 });
+

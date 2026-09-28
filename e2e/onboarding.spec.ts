@@ -1,8 +1,8 @@
-import { test, expect, urls } from "./fixtures";
+import { test, expect, urls, goto } from "./fixtures";
 
 test.describe("Onboarding", () => {
   test("shows dialog for new visitor", async ({ page }) => {
-    await page.goto(urls.chat);
+    await goto(page, urls.chat);
     await expect(
       page.getByRole("heading", { name: "Welcome to LinguaPersona" }),
     ).toBeVisible();
@@ -13,7 +13,7 @@ test.describe("Onboarding", () => {
 
   test("creates profile with valid data", async ({ page }) => {
     const email = `e2e-onboard-${Date.now()}@example.com`;
-    await page.goto(urls.chat);
+    await goto(page, urls.chat);
     await page.getByPlaceholder("Your name").fill("Ana");
     await page.getByPlaceholder("you@example.com").fill(email);
     await page.getByRole("button", { name: "Start" }).click();
@@ -35,7 +35,7 @@ test.describe("Onboarding", () => {
       data: { name: "Existing", email },
     });
 
-    await page.goto(urls.chat);
+    await goto(page, urls.chat);
     await page.getByPlaceholder("Your name").fill("Dup");
     await page.getByPlaceholder("you@example.com").fill(email);
     await page.getByRole("button", { name: "Start" }).click();
@@ -45,3 +45,4 @@ test.describe("Onboarding", () => {
     ).toBeVisible();
   });
 });
+

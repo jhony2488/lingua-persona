@@ -1,4 +1,4 @@
-import { test, expect, urls, seedProfile } from "./fixtures";
+import { test, expect, urls, seedProfile, goto } from "./fixtures";
 
 async function storedSettings(page: import("@playwright/test").Page) {
   const raw = await page.evaluate(() =>
@@ -35,7 +35,7 @@ test.describe("Settings", () => {
   test("persists teacher name and gender across reloads", async ({
     page,
   }) => {
-    await page.goto(urls.settings);
+    await goto(page, urls.settings);
 
     await page.getByLabel("Teacher name").fill("Maya");
     await selectOption(page, "Teacher voice", /Female/);
@@ -54,7 +54,7 @@ test.describe("Settings", () => {
   });
 
   test("persists level and dialect across reloads", async ({ page }) => {
-    await page.goto(urls.settings);
+    await goto(page, urls.settings);
 
     await selectOption(page, "Dialect", "British English");
     await selectOption(page, "Your level", "B2");
@@ -78,3 +78,4 @@ test.describe("Settings", () => {
     expect(stored.level).toBe("B2");
   });
 });
+

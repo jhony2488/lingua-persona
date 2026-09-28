@@ -1,4 +1,4 @@
-import { test, expect, urls, seedProfile } from "./fixtures";
+import { test, expect, urls, seedProfile, goto } from "./fixtures";
 
 test.describe("Chat", () => {
   test.beforeEach(async ({ page, userId }) => {
@@ -6,7 +6,7 @@ test.describe("Chat", () => {
   });
 
   test("creates a new empty conversation", async ({ page }) => {
-    await page.goto(urls.chat);
+    await goto(page, urls.chat);
     await page.getByRole("button", { name: "New conversation" }).click();
 
     await expect(
@@ -18,7 +18,7 @@ test.describe("Chat", () => {
   });
 
   test("sends message and receives assistant reply", async ({ page }) => {
-    await page.goto(urls.chat);
+    await goto(page, urls.chat);
     await page.getByRole("button", { name: "New conversation" }).click();
 
     await page.getByPlaceholder("Type or dictate a message…").fill("Hello, teacher!");
@@ -32,7 +32,7 @@ test.describe("Chat", () => {
   });
 
   test("starts conversation from suggested topic", async ({ page }) => {
-    await page.goto(urls.chat);
+    await goto(page, urls.chat);
     const chip = page
       .locator("button")
       .filter({ hasText: "Daily routines" });
@@ -47,7 +47,7 @@ test.describe("Chat", () => {
   });
 
   test("used topics do not reappear after reload", async ({ page }) => {
-    await page.goto(urls.chat);
+    await goto(page, urls.chat);
     await page
       .locator("button")
       .filter({ hasText: "Daily routines" })
@@ -64,7 +64,7 @@ test.describe("Chat", () => {
   });
 
   test("deletes a conversation", async ({ page }) => {
-    await page.goto(urls.chat);
+    await goto(page, urls.chat);
     await page.getByRole("button", { name: "New conversation" }).click();
     await expect(page.getByRole("button", { name: /Practice/ })).toBeVisible();
 
@@ -74,3 +74,4 @@ test.describe("Chat", () => {
     await expect(page.getByText("No conversations yet.")).toBeVisible();
   });
 });
+
