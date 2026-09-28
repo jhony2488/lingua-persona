@@ -57,7 +57,7 @@ Thank you for helping build LinguaPersona. Before opening an issue or pull reque
 2. The PR must describe what changed and why.
 3. Request at least one reviewer.
 4. CI must pass (lint, tests, and build).
-5. Avoid very large PRs; prefer smaller, focused deliveries.
+5. **Each PR must change at most 20 files.** PRs above this limit are only accepted with a very strong justification in the PR body; whenever possible, split into smaller deliveries.
 
 ## Security
 

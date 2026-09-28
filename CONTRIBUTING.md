@@ -57,7 +57,7 @@ Obrigado por querer ajudar a construir o LinguaPersona. Antes de abrir uma issue
 2. O PR deve descrever o que foi alterado e por quê.
 3. Marque pelo menos um revisor.
 4. O CI deve passar (lint, testes e build).
-5. Evite PRs muito grandes; prefira dividir em entregas menores.
+5. **Cada PR deve alterar no máximo 20 arquivos.** PRs acima desse limite só são aceitos com uma justificativa muito válida descrita no corpo do PR; quando possível, divida em entregas menores.
 
 ## Segurança
 
