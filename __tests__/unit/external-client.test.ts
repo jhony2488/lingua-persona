@@ -1,4 +1,4 @@
-/** @jest-environment node */
+/** @jest-environment <rootDir>/jest.node-env.ts */
 import { http, HttpResponse } from "msw";
 import { getJson } from "@/lib/http/external-client";
 import { server, startMockServer } from "../helpers/msw";

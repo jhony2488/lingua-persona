@@ -1,4 +1,4 @@
-/** @jest-environment node */
+/** @jest-environment <rootDir>/jest.node-env.ts */
 import type { Conversation, User } from "@prisma/client";
 import { conversationRepository } from "@/modules/conversations/conversation.repository";
 import { conversationService } from "@/modules/conversations/conversation.service";

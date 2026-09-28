@@ -58,10 +58,7 @@ export async function seedProfile(
 }
 
 /** goto + espera networkidle — evita cliques/fills revertidos pela hidratação. */
-export async function goto(
-  page: import("@playwright/test").Page,
-  url: string,
-) {
+export async function goto(page: import("@playwright/test").Page, url: string) {
   await page.goto(url);
   await page.waitForLoadState("networkidle");
 }

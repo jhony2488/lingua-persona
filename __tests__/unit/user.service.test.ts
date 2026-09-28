@@ -1,4 +1,4 @@
-/** @jest-environment node */
+/** @jest-environment <rootDir>/jest.node-env.ts */
 import type { User } from "@prisma/client";
 import { AppError } from "@/lib/errors";
 import { userRepository } from "@/modules/users/user.repository";

@@ -6,9 +6,7 @@ test.describe("Study plan", () => {
     await expect(
       page.getByText("Create your teacher profile first"),
     ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Go to chat" }),
-    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Go to chat" })).toBeVisible();
   });
 
   test("generates a 4-week plan", async ({ page, userId }) => {
@@ -36,4 +34,3 @@ test.describe("Study plan", () => {
     await expect(page.getByText(/^Study:/)).toHaveCount(0);
   });
 });
-

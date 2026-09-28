@@ -6,9 +6,7 @@ test.describe("Onboarding", () => {
     await expect(
       page.getByRole("heading", { name: "Welcome to LinguaPersona" }),
     ).toBeVisible();
-    await expect(
-      page.getByPlaceholder("Your name"),
-    ).toBeVisible();
+    await expect(page.getByPlaceholder("Your name")).toBeVisible();
   });
 
   test("creates profile with valid data", async ({ page }) => {
@@ -40,9 +38,6 @@ test.describe("Onboarding", () => {
     await page.getByPlaceholder("you@example.com").fill(email);
     await page.getByRole("button", { name: "Start" }).click();
 
-    await expect(
-      page.getByText("Could not create your profile"),
-    ).toBeVisible();
+    await expect(page.getByText("Could not create your profile")).toBeVisible();
   });
 });
-

@@ -1,4 +1,4 @@
-/** @jest-environment node */
+/** @jest-environment <rootDir>/jest.node-env.ts */
 import { z } from "zod";
 import { AppError } from "@/lib/errors";
 import { mapError, withErrorHandler } from "@/lib/http/handler";

@@ -9,9 +9,7 @@ test.describe("Chat", () => {
     await goto(page, urls.chat);
     await page.getByRole("button", { name: "New conversation" }).click();
 
-    await expect(
-      page.getByRole("button", { name: /Practice/ }),
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /Practice/ })).toBeVisible();
     await expect(
       page.getByPlaceholder("Type or dictate a message…"),
     ).toBeVisible();
@@ -21,7 +19,9 @@ test.describe("Chat", () => {
     await goto(page, urls.chat);
     await page.getByRole("button", { name: "New conversation" }).click();
 
-    await page.getByPlaceholder("Type or dictate a message…").fill("Hello, teacher!");
+    await page
+      .getByPlaceholder("Type or dictate a message…")
+      .fill("Hello, teacher!");
     await page.getByRole("button", { name: "Send message" }).click();
 
     const messages = page.locator("main").getByText("Hello, teacher!");
@@ -33,9 +33,7 @@ test.describe("Chat", () => {
 
   test("starts conversation from suggested topic", async ({ page }) => {
     await goto(page, urls.chat);
-    const chip = page
-      .locator("button")
-      .filter({ hasText: "Daily routines" });
+    const chip = page.locator("button").filter({ hasText: "Daily routines" });
     await chip.first().click();
 
     await expect(
@@ -74,4 +72,3 @@ test.describe("Chat", () => {
     await expect(page.getByText("No conversations yet.")).toBeVisible();
   });
 });
-

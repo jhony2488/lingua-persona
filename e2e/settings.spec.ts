@@ -22,9 +22,7 @@ async function selectOption(
     await page.waitForTimeout(200);
   }
   await expect(trigger).toHaveAttribute("aria-expanded", "true");
-  await page
-    .locator('[data-slot="select-item"]', { hasText: option })
-    .click();
+  await page.locator('[data-slot="select-item"]', { hasText: option }).click();
 }
 
 test.describe("Settings", () => {
@@ -32,9 +30,7 @@ test.describe("Settings", () => {
     await seedProfile(page, userId);
   });
 
-  test("persists teacher name and gender across reloads", async ({
-    page,
-  }) => {
+  test("persists teacher name and gender across reloads", async ({ page }) => {
     await goto(page, urls.settings);
 
     await page.getByLabel("Teacher name").fill("Maya");
@@ -78,4 +74,3 @@ test.describe("Settings", () => {
     expect(stored.level).toBe("B2");
   });
 });
-

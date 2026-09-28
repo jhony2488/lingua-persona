@@ -1,4 +1,4 @@
-/** @jest-environment node */
+/** @jest-environment <rootDir>/jest.node-env.ts */
 import request from "supertest";
 import { prisma } from "@/lib/prisma";
 import { createApp } from "../helpers/app";

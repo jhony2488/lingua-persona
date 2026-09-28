@@ -16,4 +16,3 @@ test.describe("PWA", () => {
 
   test.skip("install banner on beforeinstallprompt", async () => {});
 });
-
