@@ -1,4 +1,3 @@
-// e2e/features/chat.feature
 import { test, expect, urls, seedProfile } from "./fixtures";
 
 test.describe("Chat", () => {
@@ -27,7 +26,6 @@ test.describe("Chat", () => {
 
     const messages = page.locator("main").getByText("Hello, teacher!");
     await expect(messages.first()).toBeVisible();
-    // Stub do assistente responde com marcador placeholder
     await expect(page.getByText(/placeholder/i).first()).toBeVisible({
       timeout: 15000,
     });

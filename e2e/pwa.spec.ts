@@ -1,4 +1,3 @@
-// e2e/features/pwa.feature
 import { test, expect, urls } from "./fixtures";
 
 test.describe("PWA", () => {
@@ -15,7 +14,5 @@ test.describe("PWA", () => {
     await expect(page.getByText(/offline/i).first()).toBeVisible();
   });
 
-  test.skip("install banner on beforeinstallprompt", async () => {
-    // beforeinstallprompt não é disparável em headless — cenário manual
-  });
+  test.skip("install banner on beforeinstallprompt", async () => {});
 });

@@ -1,4 +1,3 @@
-// e2e/features/plan.feature
 import { test, expect, urls, seedProfile } from "./fixtures";
 
 test.describe("Study plan", () => {

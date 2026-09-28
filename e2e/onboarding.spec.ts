@@ -1,4 +1,3 @@
-// e2e/features/onboarding.feature
 import { test, expect, urls } from "./fixtures";
 
 test.describe("Onboarding", () => {
