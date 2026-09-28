@@ -2,15 +2,23 @@ import type {
   SQLiteConnection,
   SQLiteDBConnection,
 } from "@capacitor-community/sqlite";
-import type { Conversation, Message, User } from "@prisma/client";
+import type { Conversation, Message, StudyPlan, User } from "@prisma/client";
 import { ApiError } from "@/lib/api-client";
 import type {
   CreateConversationPayload,
   CreateUserPayload,
+  GeneratePlanPayload,
   SendMessageResult,
 } from "@/lib/api-client";
 import { SCHEMA_STATEMENTS } from "@/lib/local-db/schema.sql";
 import { generateAssistantReply } from "@/modules/assistant/assistant.service";
+import {
+  generatePlan,
+  type ManifestBook,
+} from "@/modules/study/plan-generator";
+import manifest from "../../../data/library/manifest.json";
+
+const manifestBooks = manifest.books as ManifestBook[];
 
 let dbPromise: Promise<SQLiteDBConnection> | null = null;
 
@@ -195,6 +203,93 @@ export const localApi = {
       userMessage: userMessage as unknown as Message,
       assistantMessage: assistantMessage as unknown as Message,
     };
+  },
+
+  async listStudyPlans(userId?: string): Promise<StudyPlan[]> {
+    const connection = await db();
+    const result = userId
+      ? await connection.query(
+          `SELECT * FROM "StudyPlan" WHERE userId = ? ORDER BY createdAt DESC`,
+          [userId],
+        )
+      : await connection.query(
+          `SELECT * FROM "StudyPlan" ORDER BY createdAt DESC`,
+        );
+    return (result.values ?? []) as unknown as StudyPlan[];
+  },
+
+  async getStudyPlan(id: string): Promise<StudyPlan> {
+    const connection = await db();
+    const result = await connection.query(
+      `SELECT * FROM "StudyPlan" WHERE id = ?`,
+      [id],
+    );
+    const row = result.values?.[0];
+    if (!row) throw new ApiError("Study plan not found", 404, "NOT_FOUND");
+    return row as unknown as StudyPlan;
+  },
+
+  async generateStudyPlan(payload: GeneratePlanPayload): Promise<StudyPlan> {
+    const connection = await db();
+    const user = await connection.query(
+      `SELECT englishLevel FROM "User" WHERE id = ?`,
+      [payload.userId],
+    );
+    const userRow = user.values?.[0] as { englishLevel: string } | undefined;
+    if (!userRow) throw new ApiError("User not found", 404, "NOT_FOUND");
+
+    const conversations = await connection.query(
+      `SELECT title FROM "Conversation" WHERE userId = ?`,
+      [payload.userId],
+    );
+    const usedTopics = (conversations.values ?? [])
+      .map((row) => (row as { title: string | null }).title)
+      .filter((t): t is string => Boolean(t));
+
+    const planJson = generatePlan({
+      level: userRow.englishLevel as Parameters<
+        typeof generatePlan
+      >[0]["level"],
+      weeks: payload.weeks ?? 4,
+      focus: payload.focus,
+      usedTopics,
+      books: manifestBooks,
+    });
+
+    const plan = {
+      id: crypto.randomUUID(),
+      userId: payload.userId,
+      level: userRow.englishLevel,
+      weeks: payload.weeks ?? 4,
+      focus: payload.focus ?? "balanced",
+      planJson: JSON.stringify(planJson),
+      createdAt: now(),
+    };
+    await connection.run(
+      `INSERT INTO "StudyPlan" (id, userId, level, weeks, focus, planJson, createdAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        plan.id,
+        plan.userId,
+        plan.level,
+        plan.weeks,
+        plan.focus,
+        plan.planJson,
+        plan.createdAt,
+      ],
+    );
+    return plan as unknown as StudyPlan;
+  },
+
+  async deleteStudyPlan(id: string): Promise<void> {
+    const connection = await db();
+    const result = await connection.run(
+      `DELETE FROM "StudyPlan" WHERE id = ?`,
+      [id],
+    );
+    if (result.changes?.changes === 0) {
+      throw new ApiError("Study plan not found", 404, "NOT_FOUND");
+    }
   },
 };
 

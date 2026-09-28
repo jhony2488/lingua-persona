@@ -41,4 +41,15 @@ export const SCHEMA_STATEMENTS = [
   `CREATE INDEX IF NOT EXISTS "Message_role_idx" ON "Message"("role")`,
   `CREATE INDEX IF NOT EXISTS "Message_conversationId_createdAt_idx" ON "Message"("conversationId", "createdAt")`,
   `CREATE INDEX IF NOT EXISTS "Message_conversationId_role_createdAt_idx" ON "Message"("conversationId", "role", "createdAt")`,
+  `CREATE TABLE IF NOT EXISTS "StudyPlan" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "level" TEXT NOT NULL,
+    "weeks" INTEGER NOT NULL,
+    "focus" TEXT,
+    "planJson" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "StudyPlan_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+  )`,
+  `CREATE INDEX IF NOT EXISTS "StudyPlan_userId_createdAt_idx" ON "StudyPlan"("userId", "createdAt")`,
 ];

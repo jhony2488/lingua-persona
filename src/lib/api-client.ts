@@ -1,5 +1,5 @@
 import { Capacitor } from "@capacitor/core";
-import type { Conversation, Message, User } from "@prisma/client";
+import type { Conversation, Message, StudyPlan, User } from "@prisma/client";
 
 export class ApiError extends Error {
   constructor(
@@ -59,6 +59,12 @@ export interface SendMessageResult {
   assistantMessage: Message;
 }
 
+export interface GeneratePlanPayload {
+  userId: string;
+  weeks?: number;
+  focus?: "grammar" | "speaking" | "balanced";
+}
+
 export const api = {
   createUser: (payload: CreateUserPayload): Promise<User> =>
     isNative()
@@ -108,4 +114,29 @@ export const api = {
             body: JSON.stringify({ content }),
           },
         ),
+
+  listStudyPlans: (userId?: string): Promise<StudyPlan[]> =>
+    isNative()
+      ? local().then((l) => l.listStudyPlans(userId))
+      : apiFetch<StudyPlan[]>(
+          userId ? `/api/study-plans?userId=${userId}` : "/api/study-plans",
+        ),
+
+  getStudyPlan: (id: string): Promise<StudyPlan> =>
+    isNative()
+      ? local().then((l) => l.getStudyPlan(id))
+      : apiFetch<StudyPlan>(`/api/study-plans/${id}`),
+
+  generateStudyPlan: (payload: GeneratePlanPayload): Promise<StudyPlan> =>
+    isNative()
+      ? local().then((l) => l.generateStudyPlan(payload))
+      : apiFetch<StudyPlan>("/api/study-plans", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        }),
+
+  deleteStudyPlan: (id: string): Promise<void> =>
+    isNative()
+      ? local().then((l) => l.deleteStudyPlan(id))
+      : apiFetch<void>(`/api/study-plans/${id}`, { method: "DELETE" }),
 };
