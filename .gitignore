@@ -63,7 +63,8 @@ SHA256SUMS.txt
 /src-tauri/target/
 /src-tauri/gen/
 /src-tauri/binaries/
-/src-tauri/resources/
+/src-tauri/resources/*
+!/src-tauri/resources/README.md
 /.next-mobile-stash/
 /.sidecar-tmp/
 

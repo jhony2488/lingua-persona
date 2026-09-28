@@ -131,6 +131,10 @@ jobs:
           npx cap add ios
           npx cap sync ios
 
+      # O .xcworkspace só é criado pelo pod install — garante explicitamente.
+      - name: Instalar CocoaPods dependencies
+        run: cd ios/App && pod install --repo-update
+
       - name: Build iOS (unsigned, simulator)
         run: |
           cd ios/App
@@ -197,12 +201,18 @@ jobs:
           npm run build:standalone
 
       - name: Preparar resources do sidecar
+        shell: bash
         run: |
           mkdir -p src-tauri/resources/server
           cp -R .next/standalone src-tauri/resources/server/
 
       - name: Baixar binário Node (sidecar)
         run: npm run sidecar:bin
+
+      - name: Sincronizar versão com a tag
+        shell: bash
+        run: |
+          node -e "const fs=require('fs');const p='src-tauri/tauri.conf.json';const c=JSON.parse(fs.readFileSync(p));c.version='${GITHUB_REF_NAME#v}';fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n')"
 
       - name: Gerar ícones do app
         run: npx tauri icon public/icons/icon-512.png
