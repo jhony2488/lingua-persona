@@ -1,3 +1,4 @@
+import { withSerwist } from "@serwist/turbopack";
 import type { NextConfig } from "next";
 
 // Pacotes com código ESM/TS em node_modules que precisam passar pelo
@@ -26,4 +27,4 @@ const nextConfig: NextConfig = {
   transpilePackages,
 };
 
-export default nextConfig;
+export default withSerwist(nextConfig);
