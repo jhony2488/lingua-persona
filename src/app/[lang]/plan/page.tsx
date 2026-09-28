@@ -7,29 +7,36 @@ import type { StudyPlan } from "@prisma/client";
 import { api } from "@/lib/api-client";
 import { useSettings } from "@/lib/store/settings";
 import { buttonVariants } from "@/components/ui/button";
+import { format } from "@/i18n/format";
+import { useDict, useLocale } from "@/i18n/provider";
 import type { PlanJson, WeekPlan } from "@/modules/study/plan-generator";
 
 function WeekCard({ week }: { week: WeekPlan }) {
+  const dict = useDict();
   return (
-    <li className="bg-card rounded-lg border p-4">
+    <li className="rounded-lg border bg-card p-4">
       <h3 className="font-semibold">
-        Week {week.week}: {week.theme}
+        {format(dict.plan.weekTitle, { week: week.week, theme: week.theme })}
       </h3>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {week.topics.map((topic) => (
           <span
             key={topic}
-            className="bg-muted rounded-full border px-2 py-0.5 text-xs"
+            className="rounded-full border bg-muted px-2 py-0.5 text-xs"
           >
             {topic}
           </span>
         ))}
       </div>
-      <ul className="text-muted-foreground mt-3 list-disc space-y-1 pl-5 text-sm">
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
         {week.study.map((item) => (
-          <li key={item.slug}>Study: {item.title}</li>
+          <li key={item.slug}>
+            {format(dict.plan.studyItem, { title: item.title })}
+          </li>
         ))}
-        {week.reading && <li>Reading: {week.reading.title}</li>}
+        {week.reading && (
+          <li>{format(dict.plan.readingItem, { title: week.reading.title })}</li>
+        )}
         {week.goals.map((goal) => (
           <li key={goal}>{goal}</li>
         ))}
@@ -39,14 +46,18 @@ function WeekCard({ week }: { week: WeekPlan }) {
 }
 
 function PlanCard({ plan }: { plan: StudyPlan }) {
+  const dict = useDict();
+  const locale = useLocale();
   const planJson = JSON.parse(plan.planJson) as PlanJson;
   return (
     <section className="space-y-3">
       <div>
         <h2 className="text-lg font-semibold">{planJson.summary}</h2>
-        <p className="text-muted-foreground text-xs">
-          Level {plan.level} · created{" "}
-          {new Date(plan.createdAt).toLocaleDateString()}
+        <p className="text-xs text-muted-foreground">
+          {format(dict.plan.levelCreated, {
+            level: plan.level,
+            date: new Date(plan.createdAt).toLocaleDateString(locale),
+          })}
         </p>
       </div>
       <ol className="grid gap-3 sm:grid-cols-2">
@@ -59,6 +70,8 @@ function PlanCard({ plan }: { plan: StudyPlan }) {
 }
 
 export default function PlanPage() {
+  const dict = useDict();
+  const locale = useLocale();
   const userId = useSettings((s) => s.userId);
   const queryClient = useQueryClient();
   const [weeks, setWeeks] = useState(4);
@@ -73,7 +86,8 @@ export default function PlanPage() {
   });
 
   const generateMutation = useMutation({
-    mutationFn: () => api.generateStudyPlan({ userId: userId!, weeks, focus }),
+    mutationFn: () =>
+      api.generateStudyPlan({ userId: userId!, weeks, focus }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["study-plans", userId] }),
   });
@@ -81,34 +95,40 @@ export default function PlanPage() {
   return (
     <main className="mx-auto min-h-screen w-full max-w-4xl p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Study plan</h1>
-        <Link href="/" className={buttonVariants({ variant: "outline" })}>
-          ← Home
+        <h1 className="text-2xl font-bold">{dict.plan.title}</h1>
+        <Link
+          href={`/${locale}`}
+          className={buttonVariants({ variant: "outline" })}
+        >
+          {dict.plan.home}
         </Link>
       </div>
 
       {!userId ? (
         <div className="rounded-lg border border-dashed p-8 text-center">
           <p className="text-muted-foreground">
-            Create your teacher profile first to generate a study plan.
+            {dict.plan.createProfileFirst}
           </p>
-          <Link href="/chat" className={buttonVariants({ className: "mt-4" })}>
-            Go to chat
+          <Link
+            href={`/${locale}/chat`}
+            className={buttonVariants({ className: "mt-4" })}
+          >
+            {dict.plan.goToChat}
           </Link>
         </div>
       ) : (
         <div className="space-y-8">
           <form
-            className="bg-card flex flex-wrap items-end gap-3 rounded-lg border p-4"
+            className="flex flex-wrap items-end gap-3 rounded-lg border bg-card p-4"
             onSubmit={(event) => {
               event.preventDefault();
               generateMutation.mutate();
             }}
           >
             <label className="grid gap-1 text-sm">
-              Weeks
+              {dict.plan.weeks}
               <select
-                className="bg-background rounded-md border px-2 py-1"
+                className="rounded-md border bg-background px-2 py-1"
                 value={weeks}
                 onChange={(event) => setWeeks(Number(event.target.value))}
               >
@@ -120,9 +140,9 @@ export default function PlanPage() {
               </select>
             </label>
             <label className="grid gap-1 text-sm">
-              Focus
+              {dict.plan.focus}
               <select
-                className="bg-background rounded-md border px-2 py-1"
+                className="rounded-md border bg-background px-2 py-1"
                 value={focus}
                 onChange={(event) =>
                   setFocus(
@@ -130,9 +150,9 @@ export default function PlanPage() {
                   )
                 }
               >
-                <option value="balanced">Balanced</option>
-                <option value="grammar">Grammar</option>
-                <option value="speaking">Speaking</option>
+                <option value="balanced">{dict.plan.focusBalanced}</option>
+                <option value="grammar">{dict.plan.focusGrammar}</option>
+                <option value="speaking">{dict.plan.focusSpeaking}</option>
               </select>
             </label>
             <button
@@ -140,22 +160,22 @@ export default function PlanPage() {
               className={buttonVariants()}
               disabled={generateMutation.isPending}
             >
-              {generateMutation.isPending ? "Generating…" : "Generate plan"}
+              {generateMutation.isPending
+                ? dict.plan.generating
+                : dict.plan.generate}
             </button>
             {generateMutation.isError && (
-              <p className="text-destructive text-sm">
+              <p className="text-sm text-destructive">
                 {generateMutation.error.message}
               </p>
             )}
           </form>
 
           {plansQuery.isLoading && (
-            <p className="text-muted-foreground">Loading plans…</p>
+            <p className="text-muted-foreground">{dict.plan.loadingPlans}</p>
           )}
           {plansQuery.data?.length === 0 && (
-            <p className="text-muted-foreground">
-              No study plans yet — generate your first one above.
-            </p>
+            <p className="text-muted-foreground">{dict.plan.noPlans}</p>
           )}
           {plansQuery.data?.map((plan) => (
             <PlanCard key={plan.id} plan={plan} />

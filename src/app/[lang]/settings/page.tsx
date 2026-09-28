@@ -17,6 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { format } from "@/i18n/format";
+import { useDict } from "@/i18n/provider";
 import {
   getNotificationPermission,
   requestNotificationPermission,
@@ -31,6 +33,7 @@ import {
 const LEVELS: EnglishLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 export default function SettingsPage() {
+  const dict = useDict();
   const {
     dialect,
     level,
@@ -45,18 +48,23 @@ export default function SettingsPage() {
     NotificationPermission | "unsupported"
   >(() => getNotificationPermission());
 
+  const permissionLabel = {
+    granted: dict.settings.permissionGranted,
+    denied: dict.settings.permissionDenied,
+    default: dict.settings.permissionDefault,
+    unsupported: dict.settings.permissionUnsupported,
+  }[permission];
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
       <Card>
         <CardHeader>
-          <CardTitle>Teacher settings</CardTitle>
-          <CardDescription>
-            Personalize how your virtual teacher talks and teaches.
-          </CardDescription>
+          <CardTitle>{dict.settings.title}</CardTitle>
+          <CardDescription>{dict.settings.description}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-5">
           <label className="flex flex-col gap-1.5 text-sm font-medium">
-            Teacher name
+            {dict.settings.teacherName}
             <Input
               value={agentName}
               onChange={(event) => setAgentName(event.target.value)}
@@ -65,7 +73,7 @@ export default function SettingsPage() {
           </label>
 
           <label className="flex flex-col gap-1.5 text-sm font-medium">
-            Teacher voice
+            {dict.settings.teacherVoice}
             <Select
               value={agentGender}
               onValueChange={(value) => setAgentGender(value as AgentGender)}
@@ -74,14 +82,18 @@ export default function SettingsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="male">Male (Alex)</SelectItem>
-                <SelectItem value="female">Female (Alexia)</SelectItem>
+                <SelectItem value="male">
+                  {dict.settings.voiceMale}
+                </SelectItem>
+                <SelectItem value="female">
+                  {dict.settings.voiceFemale}
+                </SelectItem>
               </SelectContent>
             </Select>
           </label>
 
           <label className="flex flex-col gap-1.5 text-sm font-medium">
-            Dialect
+            {dict.settings.dialect}
             <Select
               value={dialect}
               onValueChange={(value) => setDialect(value as Dialect)}
@@ -90,14 +102,18 @@ export default function SettingsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="US">American English</SelectItem>
-                <SelectItem value="UK">British English</SelectItem>
+                <SelectItem value="US">
+                  {dict.settings.americanEnglish}
+                </SelectItem>
+                <SelectItem value="UK">
+                  {dict.settings.britishEnglish}
+                </SelectItem>
               </SelectContent>
             </Select>
           </label>
 
           <label className="flex flex-col gap-1.5 text-sm font-medium">
-            Your level
+            {dict.settings.yourLevel}
             <Select
               value={level}
               onValueChange={(value) => setLevel(value as EnglishLevel)}
@@ -117,9 +133,13 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between rounded-md border p-3">
             <div>
-              <p className="text-sm font-medium">Notifications</p>
+              <p className="text-sm font-medium">
+                {dict.settings.notifications}
+              </p>
               <p className="text-muted-foreground text-xs">
-                Web Push support is prepared; permission state: {permission}
+                {format(dict.settings.notificationsDescription, {
+                  state: permissionLabel,
+                })}
               </p>
             </div>
             <Button
@@ -130,7 +150,7 @@ export default function SettingsPage() {
                 setPermission(await requestNotificationPermission())
               }
             >
-              Enable
+              {dict.settings.enable}
             </Button>
           </div>
         </CardContent>

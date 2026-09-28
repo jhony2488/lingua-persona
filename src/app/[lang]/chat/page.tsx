@@ -10,11 +10,14 @@ import { OnboardingDialog } from "@/components/chat/onboarding-dialog";
 import { TopicChips } from "@/components/chat/topic-chips";
 import { VoiceMode } from "@/components/chat/voice-mode";
 import { Card } from "@/components/ui/card";
+import { format } from "@/i18n/format";
+import { useDict } from "@/i18n/provider";
 import { api } from "@/lib/api-client";
 import { useSettings, type ChatMode } from "@/lib/store/settings";
 import { cn } from "@/lib/utils";
 
 export default function ChatPage() {
+  const dict = useDict();
   const userId = useSettings((state) => state.userId);
   const dialect = useSettings((state) => state.dialect);
   const level = useSettings((state) => state.level);
@@ -45,7 +48,7 @@ export default function ChatPage() {
     mutationFn: (topic: string) =>
       api.createConversation({
         userId: userId ?? "",
-        title: `Talk about: ${topic}`,
+        title: format(dict.chat.talkAboutTopic, { topic }),
         dialect,
         level,
       }),
@@ -69,7 +72,7 @@ export default function ChatPage() {
 
           {!selectedId && chatMode === "chat" ? (
             <div className="text-muted-foreground flex flex-1 flex-col items-center justify-center gap-4 p-6 text-sm">
-              <p>Pick a conversation or create a new one.</p>
+              <p>{dict.chat.pickConversation}</p>
               {userId && (
                 <TopicChips
                   conversations={conversations}
@@ -115,13 +118,14 @@ function ModeToggle({
   mode: ChatMode;
   onChange: (mode: ChatMode) => void;
 }) {
+  const dict = useDict();
   const options: {
     value: ChatMode;
     label: string;
     icon: ComponentType<{ className?: string }>;
   }[] = [
-    { value: "voice", label: "Voice", icon: AudioLines },
-    { value: "chat", label: "Chat", icon: MessageSquare },
+    { value: "voice", label: dict.voice.modeVoice, icon: AudioLines },
+    { value: "chat", label: dict.voice.modeChat, icon: MessageSquare },
   ];
   return (
     <div className="flex rounded-md border text-xs">
