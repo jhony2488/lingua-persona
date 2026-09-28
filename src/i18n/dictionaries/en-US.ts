@@ -118,6 +118,48 @@ export const dictionary = {
     readingItem: "Reading: {title}",
     levelCreated: "Level {level} · created {date}",
   },
+  landing: {
+    viewRepository: "Repository",
+    contribute: "Contribute",
+    releases: "Releases",
+    tagline: "Free, open-source and private — runs on your device.",
+    navDocs: "Docs",
+    eyebrow: "Free · Open-source · Private",
+    ctaPrimary: "Get the app",
+    stats: [
+      { value: "A1–C2", label: "All CEFR levels" },
+      { value: "100%", label: "Local-first & private" },
+      { value: "4", label: "Interface languages" },
+      { value: "PWA", label: "Installable & offline" },
+    ],
+    howItWorks: {
+      title: "How it works",
+      steps: [
+        {
+          title: "Create your profile",
+          text: "Pick your level, dialect and teacher persona — takes seconds, all stored on your device.",
+        },
+        {
+          title: "Pick a topic",
+          text: "Choose a conversation topic or generate a weekly study plan tailored to your level.",
+        },
+        {
+          title: "Practice",
+          text: "Chat by text or voice and get adaptive feedback — entirely offline if you want.",
+        },
+      ],
+    },
+    chatMock: {
+      user: "How do I use 'used to' correctly?",
+      teacher:
+        "Great question! 'Used to' describes past habits — for example: I used to swim every day.",
+      learner: "So: 'I used to play guitar' is correct?",
+    },
+    ctaTitle: "Start practicing today",
+    ctaText:
+      "Download the app for your platform or run it locally — your data never leaves your device.",
+    footerLicense: "License",
+  },
   onboarding: {
     title: "Welcome to LinguaPersona",
     description:

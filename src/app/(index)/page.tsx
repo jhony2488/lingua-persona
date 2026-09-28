@@ -1,16 +1,12 @@
-"use client";
+import { Landing } from "@/components/landing/landing";
+import { getDictionary } from "@/i18n/get-dictionary";
+import { defaultLocale } from "@/i18n/config";
+import { RedirectToLocale } from "./redirect-to-locale";
 
-import { useEffect } from "react";
-import { detectClientLocale } from "@/i18n/detect";
-
-export default function IndexPage() {
-  useEffect(() => {
-    window.location.replace(`/${detectClientLocale()}`);
-  }, []);
-
-  return (
-    <p className="text-muted-foreground flex min-h-screen items-center justify-center text-sm">
-      Redirecting…
-    </p>
-  );
+export default async function IndexPage() {
+  if (process.env.LANDING_PAGE === "1") {
+    const dict = await getDictionary(defaultLocale);
+    return <Landing dict={dict} />;
+  }
+  return <RedirectToLocale />;
 }
