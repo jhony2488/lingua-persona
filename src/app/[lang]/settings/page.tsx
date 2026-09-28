@@ -43,6 +43,7 @@ export default function SettingsPage() {
     setLevel,
     setAgentName,
     setAgentGender,
+    setTourCompleted,
   } = useSettings();
   const [permission, setPermission] = useState<
     NotificationPermission | "unsupported"
@@ -149,6 +150,17 @@ export default function SettingsPage() {
               }
             >
               {dict.settings.enable}
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-between rounded-md border p-3">
+            <p className="text-sm font-medium">{dict.tour.replayTitle}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setTourCompleted(false)}
+            >
+              {dict.tour.replay}
             </Button>
           </div>
         </CardContent>

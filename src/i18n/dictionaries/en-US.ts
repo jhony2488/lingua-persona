@@ -5,6 +5,7 @@ export const dictionary = {
   },
   nav: {
     chat: "Chat",
+    plan: "Plan",
     settings: "Settings",
   },
   footer: {
@@ -179,6 +180,41 @@ export const dictionary = {
     title: "You are offline",
     text: "LinguaPersona needs an internet connection for this page. Some content may still be available from the cache.",
     tryAgain: "Try again",
+  },
+  tour: {
+    stepOf: "{current} of {total}",
+    skip: "Skip",
+    back: "Back",
+    next: "Next",
+    finish: "Finish",
+    replayTitle: "Product tour",
+    replay: "Replay",
+    steps: {
+      home: {
+        title: "Welcome to LinguaPersona",
+        description:
+          "Your home base — an overview of what your private AI teacher can do.",
+      },
+      chat: {
+        title: "Chat",
+        description:
+          "Practice English by text or voice with your adaptive teacher.",
+      },
+      plan: {
+        title: "Study plan",
+        description:
+          "Generate a weekly study plan tailored to your level and focus.",
+      },
+      settings: {
+        title: "Settings",
+        description:
+          "Pick your teacher's name, voice, dialect and your CEFR level.",
+      },
+      language: {
+        title: "Interface language",
+        description: "Switch the app between English, Portuguese and Spanish.",
+      },
+    },
   },
   common: {
     redirecting: "Redirecting…",

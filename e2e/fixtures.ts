@@ -57,8 +57,37 @@ export async function seedProfile(
   );
 }
 
-/** goto + espera networkidle — evita cliques/fills revertidos pela hidratação. */
-export async function goto(page: import("@playwright/test").Page, url: string) {
+/**
+ * goto + espera networkidle — evita cliques/fills revertidos pela hidratação.
+ * Por padrão marca o product tour como concluído para não bloquear cliques;
+ * passe { tour: true } nos specs que precisam do tour visível.
+ */
+export async function goto(
+  page: import("@playwright/test").Page,
+  url: string,
+  opts: { tour?: boolean } = {},
+) {
+  if (!opts.tour) {
+    await page.addInitScript((key) => {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed?.state && parsed.state.tourCompleted === undefined) {
+            parsed.state.tourCompleted = true;
+            localStorage.setItem(key, JSON.stringify(parsed));
+          }
+        } catch {
+          // Store inválido — o Zustand recria com os defaults.
+        }
+        return;
+      }
+      localStorage.setItem(
+        key,
+        JSON.stringify({ state: { tourCompleted: true }, version: 0 }),
+      );
+    }, SETTINGS_KEY);
+  }
   await page.goto(url);
   await page.waitForLoadState("networkidle");
 }

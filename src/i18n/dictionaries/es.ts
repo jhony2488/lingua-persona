@@ -7,6 +7,7 @@ export const dictionary: Dictionary = {
   },
   nav: {
     chat: "Chat",
+    plan: "Plan",
     settings: "Configuración",
   },
   footer: {
@@ -182,6 +183,41 @@ export const dictionary: Dictionary = {
     title: "Estás sin conexión",
     text: "LinguaPersona necesita conexión a internet para esta página. Parte del contenido puede seguir disponible en la caché.",
     tryAgain: "Reintentar",
+  },
+  tour: {
+    stepOf: "{current} de {total}",
+    skip: "Omitir",
+    back: "Atrás",
+    next: "Siguiente",
+    finish: "Finalizar",
+    replayTitle: "Tour del producto",
+    replay: "Repetir",
+    steps: {
+      home: {
+        title: "Bienvenido a LinguaPersona",
+        description:
+          "Tu punto de partida — una vista general de lo que puede hacer tu profesor de IA privado.",
+      },
+      chat: {
+        title: "Chat",
+        description:
+          "Practica inglés por texto o voz con tu profesor adaptativo.",
+      },
+      plan: {
+        title: "Plan de estudios",
+        description:
+          "Genera un plan semanal a tu medida según tu nivel y enfoque.",
+      },
+      settings: {
+        title: "Configuración",
+        description:
+          "Elige el nombre, la voz y el dialecto del profesor y tu nivel MCER.",
+      },
+      language: {
+        title: "Idioma de la interfaz",
+        description: "Cambia la app entre inglés, portugués y español.",
+      },
+    },
   },
   common: {
     redirecting: "Redirigiendo…",

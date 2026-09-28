@@ -6,6 +6,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { InstallBanner } from "@/components/pwa/install-banner";
 import { SwRegister } from "@/components/pwa/sw-register";
 import { Providers } from "@/components/providers";
+import { ProductTour } from "@/components/tour/product-tour";
 import { locales } from "@/i18n/config";
 import { getDictionary, hasLocale } from "@/i18n/get-dictionary";
 import { I18nProvider } from "@/i18n/provider";
@@ -73,6 +74,7 @@ export default async function RootLayout({
               <nav className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
                 <Link
                   href={`/${lang}`}
+                  data-tour="home"
                   className="text-lg font-bold tracking-tight"
                 >
                   LinguaPersona
@@ -80,17 +82,28 @@ export default async function RootLayout({
                 <div className="flex items-center gap-4 text-sm font-medium">
                   <Link
                     href={`/${lang}/chat`}
+                    data-tour="chat"
                     className="text-muted-foreground hover:text-foreground"
                   >
                     {dict.nav.chat}
                   </Link>
                   <Link
+                    href={`/${lang}/plan`}
+                    data-tour="plan"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    {dict.nav.plan}
+                  </Link>
+                  <Link
                     href={`/${lang}/settings`}
+                    data-tour="settings"
                     className="text-muted-foreground hover:text-foreground"
                   >
                     {dict.nav.settings}
                   </Link>
-                  <LanguageSwitcher />
+                  <span data-tour="language" className="inline-flex">
+                    <LanguageSwitcher />
+                  </span>
                 </div>
               </nav>
             </header>
@@ -100,6 +113,7 @@ export default async function RootLayout({
             </footer>
             <InstallBanner />
             <SwRegister />
+            <ProductTour />
           </I18nProvider>
         </Providers>
       </body>

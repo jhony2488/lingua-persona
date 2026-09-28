@@ -17,6 +17,7 @@ interface SettingsState {
   agentGender: AgentGender;
   chatMode: ChatMode;
   voiceFlow: VoiceFlow;
+  tourCompleted: boolean;
   setUserId: (userId: string | null) => void;
   setDialect: (dialect: Dialect) => void;
   setLevel: (level: EnglishLevel) => void;
@@ -24,6 +25,7 @@ interface SettingsState {
   setAgentGender: (gender: AgentGender) => void;
   setChatMode: (mode: ChatMode) => void;
   setVoiceFlow: (flow: VoiceFlow) => void;
+  setTourCompleted: (completed: boolean) => void;
 }
 
 export const useSettings = create<SettingsState>()(
@@ -36,6 +38,7 @@ export const useSettings = create<SettingsState>()(
       agentGender: "male",
       chatMode: "chat",
       voiceFlow: "auto",
+      tourCompleted: false,
       setUserId: (userId) => set({ userId }),
       setDialect: (dialect) => set({ dialect }),
       setLevel: (level) => set({ level }),
@@ -43,6 +46,7 @@ export const useSettings = create<SettingsState>()(
       setAgentGender: (agentGender) => set({ agentGender }),
       setChatMode: (chatMode) => set({ chatMode }),
       setVoiceFlow: (voiceFlow) => set({ voiceFlow }),
+      setTourCompleted: (tourCompleted) => set({ tourCompleted }),
     }),
     { name: "linguapersona-settings" },
   ),
