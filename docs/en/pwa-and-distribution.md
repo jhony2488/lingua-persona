@@ -36,28 +36,48 @@ Cache strategies in `sw.ts`:
 
 `src/lib/notifications.ts` wraps permission (`Notification.requestPermission`) and push subscription (`pushManager.getSubscription`). Web Push with VAPID is deferred to a later phase.
 
-> **Note**: `output: "export"` is not used — Route Handlers (`/api/*`) require a Node server. To package with Capacitor/Tauri, the API must be hosted separately or embedded.
+> **Local-first architecture**: no external server required.
+> **Desktop** embeds the Next.js standalone backend as a Tauri sidecar
+> (`localhost:3111`, SQLite in `appDataDir` via `DATABASE_URL` + schema
+> bootstrap in `src/instrumentation.ts`). **Mobile** bundles the UI
+> (`build:mobile` → `out/`) and stores data locally via
+> `@capacitor-community/sqlite` (`src/lib/local-db/`) — `api-client`
+> picks the local layer when `Capacitor.isNativePlatform()`.
 
 ## Packaging and releases (CI/CD)
 
 Two workflows in `.github/workflows/`:
 
 - `ci.yml` — lint, format:check, tests and build on push/PR to `master`
-- `release.yml` — on `v*.*.*` tags: build → package `app-release.pk` (tar.gz of `.next/static`), `app-release.rxe` (zip of `.next`), `SHA256SUMS.txt` → GitHub Release
+- `release.yml` — on `v*.*.*` tags:
+  - **web**: `.pk` (static) + `.rxe` (.next)
+  - **android**: `build:mobile` → `cap sync` → `app-debug.apk`
+  - **ios**: `build:mobile` → `cap sync` → `LinguaPersona.app` (unsigned)
+  - **desktop**: standalone → Node sidecar binary → `tauri build` (`.msi`/`.dmg`/`.deb`)
+  - aggregates everything + `SHA256SUMS.txt` → GitHub Release
+
+## Native scripts
+
+| Script                     | Purpose                                                  |
+| -------------------------- | -------------------------------------------------------- |
+| `npm run build:mobile`     | Static export `out/` (temporary stash of api/sw)         |
+| `npm run mobile:sync`      | `cap sync` for Android/iOS                               |
+| `npm run build:standalone` | Completes `.next/standalone` (static + public + .prisma) |
+| `npm run sidecar:bin`      | Downloads the sidecar Node binary per platform           |
 
 ## Build matrix
 
-| Platform | Technology        | Output                             |
-| -------- | ----------------- | ---------------------------------- |
-| Web/PWA  | Next.js + Serwist | `.next/` + `app-release.pk`/`.rxe` |
-| Android  | Capacitor         | `.apk` / `.aab` (needs API)        |
-| iOS      | Capacitor         | `.ipa` (macOS + Xcode, needs API)  |
-| Desktop  | Tauri             | `.exe`/`.msi`/`.dmg` (needs API)   |
+| Platform | Technology                        | Output                             |
+| -------- | --------------------------------- | ---------------------------------- |
+| Web/PWA  | Next.js standalone + Serwist      | `.next/` + `app-release.pk`/`.rxe` |
+| Android  | Capacitor + local sqlite          | `app-debug.apk` (unsigned)         |
+| iOS      | Capacitor + local sqlite          | `LinguaPersona.app` (unsigned)     |
+| Desktop  | Tauri + Node sidecar (standalone) | `.msi`/`.dmg`/`.deb` (unsigned)    |
 
 ## Capacitor steps
 
 ```bash
-npm run build
+npm run build:mobile
 npx cap sync
 npx cap open android   # or ios
 ```
