@@ -1,4 +1,4 @@
-/** @jest-environment node */
+/** @jest-environment <rootDir>/jest.node-env.ts */
 import {
   createUserSchema,
   updateUserSchema,
