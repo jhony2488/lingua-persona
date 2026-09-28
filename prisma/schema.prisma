@@ -16,6 +16,7 @@ model User {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   conversations    Conversation[]
+  studyPlans       StudyPlan[]
 
   @@index([createdAt])
   @@index([englishLevel])
@@ -48,4 +49,17 @@ model Message {
   @@index([role])
   @@index([conversationId, createdAt])
   @@index([conversationId, role, createdAt])
+}
+
+model StudyPlan {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level     String
+  weeks     Int
+  focus     String?
+  planJson  String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }

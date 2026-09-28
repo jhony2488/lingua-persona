@@ -16,6 +16,8 @@ cpSync(join(root, ".next", "static"), join(standalone, ".next", "static"), {
   recursive: true,
 });
 cpSync(join(root, "public"), join(standalone, "public"), { recursive: true });
+// Corpus/manifests consumidos em runtime (ex.: study plan generator).
+cpSync(join(root, "data"), join(standalone, "data"), { recursive: true });
 
 const prismaClient = join(root, "node_modules", ".prisma");
 if (existsSync(prismaClient)) {
