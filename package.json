@@ -1,6 +1,6 @@
 {
   "name": "linguapersona",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,6 +11,8 @@
     "format:check": "prettier --check .",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "prepare": "husky",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -51,6 +53,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.2",
+    "@playwright/test": "^1.63.0",
     "@swc/jest": "^0.2.39",
     "@tailwindcss/postcss": "^4",
     "@tauri-apps/cli": "^2.12.0",

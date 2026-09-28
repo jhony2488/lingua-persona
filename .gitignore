@@ -67,6 +67,10 @@ SHA256SUMS.txt
 /.next-mobile-stash/
 /.sidecar-tmp/
 
+# playwright
+/playwright-report/
+/test-results/
+
 # vercel
 .vercel
 
