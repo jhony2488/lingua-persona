@@ -83,6 +83,8 @@ the sidecar on localhost. Shared pure logic (`plan-generator`, Zod schemas,
 
 - **Commits**: conventional prefixes, English only (`feat:`, `fix:`,
   `docs:`, `chore:`). SSH-signed.
+- **PRs**: max 20 changed files; larger only with strong justification in
+  the PR body — prefer splitting into smaller deliveries.
 - **Migrations**: never edit an applied `prisma/migrations/*` file — create a
   new migration. Mirror any schema change in `src/lib/local-db/schema.sql.ts`.
 - **API**: validate with Zod (`parseBody`/`parseQuery`/`parseParams`), throw
