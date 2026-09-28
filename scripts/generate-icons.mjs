@@ -18,8 +18,7 @@ function drawIcon(size, circleRatio) {
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const idx = (size * y + x) << 2;
-      const inside =
-        Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) <= r;
+      const inside = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) <= r;
       const color = inside ? FG : BG;
       png.data[idx] = color.r;
       png.data[idx + 1] = color.g;

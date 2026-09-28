@@ -14,9 +14,7 @@ export const messageRepository = {
   },
 
   createMany(data: Prisma.MessageUncheckedCreateInput[]): Promise<number> {
-    return prisma.message
-      .createMany({ data })
-      .then((result) => result.count);
+    return prisma.message.createMany({ data }).then((result) => result.count);
   },
 };
 
