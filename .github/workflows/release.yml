@@ -127,12 +127,14 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Deps Linux (webkit2gtk)
+      - name: Deps Linux (webkit2gtk + fuse para linuxdeploy)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev \
-            librsvg2-dev patchelf
+            librsvg2-dev patchelf fuse
+          # ubuntu-24.04 renomeou libfuse2 → libfuse2t64
+          sudo apt-get install -y libfuse2t64 || sudo apt-get install -y libfuse2
 
       - name: Instalar Dependências
         run: npm ci
@@ -172,6 +174,9 @@ jobs:
 
       - name: Build Tauri bundles
         run: npx tauri build
+        env:
+          # linuxdeploy é um AppImage — extract-and-run contorna falta de FUSE
+          APPIMAGE_EXTRACT_AND_RUN: "1"
 
       - name: Upload artefatos desktop
         uses: actions/upload-artifact@v4
