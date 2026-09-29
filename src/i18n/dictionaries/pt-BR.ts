@@ -141,6 +141,8 @@ export const dictionary: Dictionary = {
     releases: "Releases",
     tagline: "Gratuito, open-source e privado — roda no seu dispositivo.",
     navDocs: "Docs",
+    toggleTheme: "Alternar tema",
+    toggleLanguage: "Idioma",
     eyebrow: "Gratuito · Open-source · Privado",
     ctaPrimary: "Baixar o app",
     stats: [

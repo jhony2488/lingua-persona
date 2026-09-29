@@ -138,6 +138,8 @@ export const dictionary = {
     releases: "Releases",
     tagline: "Free, open-source and private — runs on your device.",
     navDocs: "Docs",
+    toggleTheme: "Toggle theme",
+    toggleLanguage: "Language",
     eyebrow: "Free · Open-source · Private",
     ctaPrimary: "Get the app",
     stats: [
