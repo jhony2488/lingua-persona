@@ -1,5 +1,3 @@
 {
-  // .npmrc tem ignore-scripts=true — o postinstall do Prisma não roda na
-  // Vercel. Rebuild dos engines nativos + generate espelham o CI.
   "installCommand": "npm ci && npm rebuild @prisma/engines esbuild && npx prisma generate"
 }
