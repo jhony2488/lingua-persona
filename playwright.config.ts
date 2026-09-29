@@ -20,6 +20,6 @@ export default defineConfig({
     timeout: 120_000,
     // Garante o app completo no e2e mesmo com LANDING_PAGE=1 no .env local
     // (env do processo tem precedência sobre .env no Next.js).
-    env: { LANDING_PAGE: "0" },
+    env: { LANDING_PAGE: "0", NEXT_PUBLIC_LANDING_PAGE: "0" },
   },
 });

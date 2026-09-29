@@ -7,6 +7,7 @@ import {
   LOCALE_COOKIE,
   type Locale,
 } from "@/i18n/config";
+import { IS_LANDING } from "@/lib/env";
 
 // Locale preferido: cookie gravado pelo seletor de idioma >
 // Accept-Language do navegador > default.
@@ -26,9 +27,9 @@ function getLocale(request: NextRequest): Locale {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Landing institucional: LANDING_PAGE=1 serve "/" como página pública e
+  // Landing institucional: IS_LANDING serve "/" como página pública e
   // oculta o app — quem usa baixa o release ou roda localmente.
-  if (process.env.LANDING_PAGE === "1") {
+  if (IS_LANDING) {
     if (pathname === "/") return;
     request.nextUrl.pathname = "/";
     return NextResponse.redirect(request.nextUrl);

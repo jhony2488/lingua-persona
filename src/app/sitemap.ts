@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { IS_LANDING } from "@/lib/env";
 
 export const dynamic = "force-static";
 
@@ -7,7 +8,7 @@ const SITE_URL =
   "https://github.com/jhony2488/lingua-persona";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  if (process.env.LANDING_PAGE !== "1") return [];
+  if (!IS_LANDING) return [];
   return [
     {
       url: SITE_URL,

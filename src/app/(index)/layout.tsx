@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { defaultLocale, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { IS_LANDING } from "@/lib/env";
 import "../globals.css";
 
 const SITE_URL =
@@ -9,7 +10,7 @@ const SITE_URL =
   "https://github.com/jhony2488/lingua-persona";
 
 export async function generateMetadata(): Promise<Metadata> {
-  if (process.env.LANDING_PAGE !== "1") return {};
+  if (!IS_LANDING) return {};
 
   const dict = await getDictionary(defaultLocale);
 
@@ -81,7 +82,7 @@ const themeInit = `(function(){try{var t=localStorage.getItem("linguapersona-the
 // redireciona antes desta página renderizar; no static export (mobile),
 // ela é o index.html que redireciona no cliente.
 export default function IndexLayout({ children }: { children: ReactNode }) {
-  const landing = process.env.LANDING_PAGE === "1";
+  const landing = IS_LANDING;
   return (
     <html lang={landing ? defaultLocale : "en"}>
       <body>
