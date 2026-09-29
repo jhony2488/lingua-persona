@@ -158,6 +158,16 @@ async function main() {
     const targetDir = path.join(root, "public", "models", ...repo.split("/"));
     await downloadHfFiles(repo, targetDir);
   }
+
+  // O runtime usa este manifest para decidir se serve os pesos de
+  // /models/* (self-hosted) ou baixa do Hugging Face (prebuiltAppConfig).
+  const manifest = {
+    models: MODELS.map(({ modelId, modelLib }) => ({ modelId, modelLib })),
+  };
+  const manifestPath = path.join(root, "public", "models", "manifest.json");
+  fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+  console.log("[download-mlc] wrote: public/models/manifest.json");
 }
 
 main().catch((err) => {

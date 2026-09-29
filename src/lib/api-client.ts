@@ -1,5 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import type { Conversation, Message, StudyPlan, User } from "@prisma/client";
+import { useSettings } from "@/lib/store/settings";
 
 export class ApiError extends Error {
   constructor(
@@ -59,6 +60,17 @@ export interface SendMessageResult {
   assistantMessage: Message;
 }
 
+export interface CreateMessagePayload {
+  content: string;
+  role?: "user" | "assistant";
+}
+
+/** Nível/dialeto da conversa — default: settings do usuário. */
+export interface SendMessageContext {
+  level?: string;
+  dialect?: string;
+}
+
 export interface GeneratePlanPayload {
   userId: string;
   weeks?: number;
@@ -101,19 +113,46 @@ export const api = {
       ? local().then((l) => l.listMessages(conversationId))
       : apiFetch<Message[]>(`/api/conversations/${conversationId}/messages`),
 
-  sendMessage: (
+  createMessage: (
+    conversationId: string,
+    input: CreateMessagePayload,
+  ): Promise<Message> =>
+    isNative()
+      ? local().then((l) => l.createMessage(conversationId, input))
+      : apiFetch<Message>(`/api/conversations/${conversationId}/messages`, {
+          method: "POST",
+          body: JSON.stringify(input),
+        }),
+
+  /**
+   * Persiste a mensagem do usuário, gera a resposta no engine local
+   * (WebLLM → Ollama → fallback; src/lib/llm/router.ts) e persiste a
+   * resposta do assistente. O retorno mantém o par {user, assistant}.
+   */
+  sendMessage: async (
     conversationId: string,
     content: string,
-  ): Promise<SendMessageResult> =>
-    isNative()
-      ? local().then((l) => l.sendMessage(conversationId, content))
-      : apiFetch<SendMessageResult>(
-          `/api/conversations/${conversationId}/messages`,
-          {
-            method: "POST",
-            body: JSON.stringify({ content }),
-          },
-        ),
+    ctx?: SendMessageContext,
+  ): Promise<SendMessageResult> => {
+    const userMessage = await api.createMessage(conversationId, {
+      content,
+      role: "user",
+    });
+    const history = await api.listMessages(conversationId);
+    const settings = useSettings.getState();
+    const { generateChatReply } = await import("@/lib/llm/router");
+    const { reply } = await generateChatReply(history, {
+      level: ctx?.level ?? settings.level,
+      dialect: ctx?.dialect ?? settings.dialect,
+      agentName: settings.agentName,
+      agentGender: settings.agentGender,
+    });
+    const assistantMessage = await api.createMessage(conversationId, {
+      content: reply,
+      role: "assistant",
+    });
+    return { userMessage, assistantMessage };
+  },
 
   listStudyPlans: (userId?: string): Promise<StudyPlan[]> =>
     isNative()

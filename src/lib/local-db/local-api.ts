@@ -8,10 +8,8 @@ import type {
   CreateConversationPayload,
   CreateUserPayload,
   GeneratePlanPayload,
-  SendMessageResult,
 } from "@/lib/api-client";
 import { SCHEMA_STATEMENTS } from "@/lib/local-db/schema.sql";
-import { generateAssistantReply } from "@/modules/assistant/assistant.service";
 import {
   generatePlan,
   type ManifestBook,
@@ -153,56 +151,39 @@ export const localApi = {
     return (result.values ?? []) as unknown as Message[];
   },
 
-  async sendMessage(
+  // Persiste uma mensagem por vez — a resposta do assistente é gerada no
+  // cliente (src/lib/llm/router.ts) e gravada numa segunda chamada.
+  async createMessage(
     conversationId: string,
-    content: string,
-  ): Promise<SendMessageResult> {
+    input: { content: string; role?: "user" | "assistant" },
+  ): Promise<Message> {
     const connection = await db();
     const conversation = await connection.query(
-      `SELECT level FROM "Conversation" WHERE id = ?`,
+      `SELECT id FROM "Conversation" WHERE id = ?`,
       [conversationId],
     );
-    const row = conversation.values?.[0] as { level: string } | undefined;
-    if (!row) throw new ApiError("Conversation not found", 404, "NOT_FOUND");
+    if (!conversation.values?.length) {
+      throw new ApiError("Conversation not found", 404, "NOT_FOUND");
+    }
 
-    const userMessage = {
+    const message = {
       id: crypto.randomUUID(),
       conversationId,
-      role: "user",
-      content,
-      createdAt: now(),
-    };
-    const assistantMessage = {
-      id: crypto.randomUUID(),
-      conversationId,
-      role: "assistant",
-      content: generateAssistantReply(content, row.level),
+      role: input.role ?? "user",
+      content: input.content,
       createdAt: now(),
     };
     await connection.run(
       `INSERT INTO "Message" (id, conversationId, role, content, createdAt) VALUES (?, ?, ?, ?, ?)`,
       [
-        userMessage.id,
+        message.id,
         conversationId,
-        "user",
-        userMessage.content,
-        userMessage.createdAt,
+        message.role,
+        message.content,
+        message.createdAt,
       ],
     );
-    await connection.run(
-      `INSERT INTO "Message" (id, conversationId, role, content, createdAt) VALUES (?, ?, ?, ?, ?)`,
-      [
-        assistantMessage.id,
-        conversationId,
-        "assistant",
-        assistantMessage.content,
-        assistantMessage.createdAt,
-      ],
-    );
-    return {
-      userMessage: userMessage as unknown as Message,
-      assistantMessage: assistantMessage as unknown as Message,
-    };
+    return message as unknown as Message;
   },
 
   async listStudyPlans(userId?: string): Promise<StudyPlan[]> {
