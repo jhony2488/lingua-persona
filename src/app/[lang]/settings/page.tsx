@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -45,9 +45,14 @@ export default function SettingsPage() {
     setAgentGender,
     setTourCompleted,
   } = useSettings();
+  // Inicializa como "unsupported" para casar com o SSR — a permissão real só
+  // existe no cliente e é sincronizada no efeito (evita hydration mismatch).
   const [permission, setPermission] = useState<
     NotificationPermission | "unsupported"
-  >(() => getNotificationPermission());
+  >("unsupported");
+  useEffect(() => {
+    setPermission(getNotificationPermission());
+  }, []);
 
   const permissionLabel = {
     granted: dict.settings.permissionGranted,

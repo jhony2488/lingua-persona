@@ -1,7 +1,7 @@
 import { test, expect, urls, goto, seedProfile } from "./fixtures";
 
 const tourDialog = (page: import("@playwright/test").Page) =>
-  page.getByRole("dialog", { name: "Welcome to LinguaPersona" });
+  page.getByRole("dialog", { name: "Product tour" });
 
 test.describe("Product tour", () => {
   test("shows on first visit and persists completion", async ({ page }) => {

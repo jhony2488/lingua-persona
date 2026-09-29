@@ -36,7 +36,7 @@ describe("ProductTour", () => {
   it("shows the first step on mount", async () => {
     renderTour();
     const dialog = await screen.findByRole("dialog", {
-      name: "Welcome to LinguaPersona",
+      name: "Product tour",
     });
     expect(within(dialog).getByText("1 of 5")).toBeInTheDocument();
   });
@@ -82,7 +82,7 @@ describe("ProductTour", () => {
 
     act(() => useSettings.setState({ userId: "user-1" }));
     expect(
-      await screen.findByRole("dialog", { name: "Welcome to LinguaPersona" }),
+      await screen.findByRole("dialog", { name: "Product tour" }),
     ).toBeInTheDocument();
   });
 });

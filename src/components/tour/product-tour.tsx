@@ -111,7 +111,7 @@ export function ProductTour() {
       )}
       <div
         role="dialog"
-        aria-label={content.title}
+        aria-label={dict.tour.replayTitle}
         className="bg-card fixed z-50 rounded-lg border p-4 shadow-lg"
         style={{ width: POPOVER_WIDTH, ...popoverStyle }}
       >
