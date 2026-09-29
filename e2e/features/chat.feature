@@ -33,3 +33,19 @@ Funcionalidade: Chat de conversação
     Dado que eu tenho uma conversa na lista
     Quando eu clico no botão de deletar da conversa
     Então a conversa deve sumir da lista
+
+  @skip
+  Cenário: Modelo LLM pré-carrega em background ao abrir o app
+    # WebGPU/WebLLM não existem em headless — cenário manual
+    Dado que o navegador suporta WebGPU e o engine está como "auto"
+    Quando eu abro qualquer página do app
+    Então os pesos do modelo devem começar a baixar em background
+    E a primeira resposta do chat não espera o download
+
+  @skip
+  Cenário: Voz usa Whisper local quando SpeechRecognition não existe
+    # SpeechRecognition/mic não existem em headless — cenário manual
+    Dado que o navegador não suporta SpeechRecognition (ex.: Tauri)
+    Quando eu pressiono o orbe de voz e falo
+    Então a fala deve ser transcrita pelo Whisper on-device
+    E a resposta deve ser falada normalmente

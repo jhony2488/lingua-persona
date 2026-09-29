@@ -72,7 +72,8 @@ function send(message: WhisperWorkerRequest, transfer?: Transferable[]) {
 export function initWhisper(
   onProgress?: (text: string) => void,
 ): Promise<void> {
-  if (!isWhisperSupported()) return Promise.reject(new Error("Whisper unsupported"));
+  if (!isWhisperSupported())
+    return Promise.reject(new Error("Whisper unsupported"));
   progressCallback = onProgress ?? null;
   initPromise ??= new Promise<void>((resolve, reject) => {
     const w = ensureWorker();

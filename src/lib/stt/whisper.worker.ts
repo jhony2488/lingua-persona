@@ -78,9 +78,7 @@ self.onmessage = async (event: MessageEvent<WhisperWorkerRequest>) => {
   const message = event.data;
   if (message.type === "init") {
     try {
-      await initTranscriber((file) =>
-        post({ type: "progress", text: file }),
-      );
+      await initTranscriber((file) => post({ type: "progress", text: file }));
       await warmup();
       post({ type: "ready" });
     } catch (error) {
@@ -97,7 +95,9 @@ self.onmessage = async (event: MessageEvent<WhisperWorkerRequest>) => {
         language: "english",
         task: "transcribe",
       });
-      const text = Array.isArray(output) ? (output[0]?.text ?? "") : output.text;
+      const text = Array.isArray(output)
+        ? (output[0]?.text ?? "")
+        : output.text;
       post({ type: "result", id: message.id, text: text.trim() });
     } catch (error) {
       post({ type: "error", id: message.id, message: String(error) });
