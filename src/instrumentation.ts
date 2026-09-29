@@ -10,3 +10,4 @@ export async function register() {
     await prisma.$executeRawUnsafe(statement);
   }
 }
+
