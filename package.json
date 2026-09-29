@@ -1,6 +1,6 @@
 {
   "name": "linguapersona",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "private": true,
   "engines": {
     "node": ">=22"
@@ -37,6 +37,7 @@
     "@capacitor/core": "^8.5.2",
     "@capacitor/ios": "^8.5.2",
     "@formatjs/intl-localematcher": "^0.9.0",
+    "@huggingface/transformers": "^4.3.0",
     "@mlc-ai/web-llm": "^0.2.85",
     "@prisma/client": "^6.19.3",
     "@serwist/turbopack": "^9.5.12",

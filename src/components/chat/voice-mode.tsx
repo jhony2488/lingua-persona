@@ -11,7 +11,7 @@ import { format } from "@/i18n/format";
 import { useDict } from "@/i18n/provider";
 import type { SendMessageResult } from "@/lib/api-client";
 import {
-  createSpeechRecognition,
+  createSTT,
   speak,
   speechLang,
   stopSpeaking,
@@ -91,7 +91,7 @@ export function VoiceMode({
   };
 
   const startListening = () => {
-    const recognition = createSpeechRecognition();
+    const recognition = createSTT();
     if (!recognition) {
       setSupported(false);
       return;

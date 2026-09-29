@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useDict } from "@/i18n/provider";
 import {
-  createSpeechRecognition,
+  createSTT,
   speechLang,
   type SpeechRecognitionLike,
 } from "@/lib/speech";
@@ -55,7 +55,7 @@ export function VoiceButton({
       return;
     }
 
-    const recognition = createSpeechRecognition();
+    const recognition = createSTT();
     if (!recognition) {
       setSupported(false);
       return;

@@ -1,3 +1,5 @@
+import { isWhisperSupported } from "@/lib/stt/whisper.engine";
+import { WhisperRecognition } from "@/lib/stt/whisper.recognition";
 import type { AgentGender, Dialect } from "@/lib/store/settings";
 
 export interface SpeechRecognitionResultItem {
@@ -34,6 +36,16 @@ export function createSpeechRecognition(): SpeechRecognitionLike | null {
   };
   const Ctor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
   return Ctor ? new Ctor() : null;
+}
+
+/**
+ * STT unificado: Web Speech API quando disponível; senão Whisper on-device
+ * (webviews Tauri, Firefox, mobile sem suporte). `null` = nenhum dos dois.
+ */
+export function createSTT(): SpeechRecognitionLike | null {
+  const native = createSpeechRecognition();
+  if (native) return native;
+  return isWhisperSupported() ? new WhisperRecognition() : null;
 }
 
 const MALE_HINTS = /\b(male|david|alex|daniel|fred|george)/i;

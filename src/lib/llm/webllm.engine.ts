@@ -90,21 +90,29 @@ export async function initWebLLM(
 ): Promise<WebWorkerMLCEngine> {
   const webllm = await import("@mlc-ai/web-llm");
   const appConfig = await resolveAppConfig();
-  enginePromise ??= (async () => {
-    const config = { appConfig, initProgressCallback: onProgress };
-    try {
-      return await webllm.CreateWebWorkerMLCEngine(
-        createWorker(),
-        model.modelId,
-        config,
-      );
-    } catch {
-      return (await webllm.CreateMLCEngine(
-        model.modelId,
-        config,
-      )) as unknown as WebWorkerMLCEngine;
-    }
-  })();
+  if (!enginePromise) {
+    const pending = (async () => {
+      const config = { appConfig, initProgressCallback: onProgress };
+      try {
+        return await webllm.CreateWebWorkerMLCEngine(
+          createWorker(),
+          model.modelId,
+          config,
+        );
+      } catch {
+        return (await webllm.CreateMLCEngine(
+          model.modelId,
+          config,
+        )) as unknown as WebWorkerMLCEngine;
+      }
+    })();
+    enginePromise = pending;
+    // Um init rejeitado não pode envenenar o singleton: libera para retry
+    // (importante com o preload em background, que pode falhar por rede).
+    pending.catch(() => {
+      if (enginePromise === pending) enginePromise = null;
+    });
+  }
   const engine = await enginePromise;
   engine.setInitProgressCallback(onProgress);
   loadedModelId ??= model.modelId;
