@@ -53,6 +53,7 @@ The user's preference (`settings.llmEngine`: `auto | webllm | ollama | local`) c
 - **Web Workers**: WebLLM and tokenization run off the main thread.
 - **Quantization**: 4-bit models (q4f16) are the default.
 - **On-demand download**: weights come from Hugging Face on first use and stay in the Cache API/IndexedDB; `npm run download-models` enables self-hosting.
+- **Background preload**: `ModelPreloader` (`src/components/model-preloader.tsx`, mounted in the localized layout) starts `initWebLLM` at idle time when any page opens, so the first reply doesn't wait for the download. It respects the engine preference (`ollama`/`local` skip it), WebGPU availability, and `navigator.connection.saveData`. A failed init clears the engine singleton so the next message can retry.
 
 ## WebLLM vs Ollama
 

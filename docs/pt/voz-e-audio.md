@@ -59,9 +59,22 @@ utterance.lang = "en-US"; // ou "en-GB"
 window.speechSynthesis.speak(utterance);
 ```
 
+## Fallback Whisper on-device
+
+`createSTT()` (`src/lib/speech.ts`) escolhe o engine de transcrição:
+
+1. **`SpeechRecognition`** (Web Speech API) — padrão quando existe.
+2. **`WhisperRecognition`** (`src/lib/stt/`) — fallback on-device para webviews sem suporte (Tauri/WebKitGTK, Firefox, parte do mobile).
+
+O fallback roda `Xenova/whisper-tiny` via `@huggingface/transformers` num **Web Worker dedicado** (`src/lib/stt/whisper.worker.ts`), mantido quente durante toda a sessão ("sempre rodando" — o pipeline não é descarregado). O `ModelPreloader` também pré-aquece o Whisper ao abrir o app quando `SpeechRecognition` não existe.
+
+- **Pesos**: servidos de `/models/Xenova/whisper-tiny` quando `npm run download-models` já baixou o corpus (probe em `config.json`); senão, do Hugging Face com cache do transformers.js.
+- **Fluxo**: `MediaRecorder` captura o áudio e um `AnalyserNode` mede o nível RMS — ~2s de silêncio após fala finaliza a transcrição (o timer externo de 10s segue como teto). Cada fala emite um resultado `isFinal` — não há resultados parciais (interim) como na Web Speech API.
+- **Requisitos**: `getUserMedia` + WebAssembly + Worker; sem eles a UI mostra "não suportado".
+
 ## Considerações
 
-- Nem todos os navegadores suportam `SpeechRecognition` nativamente. No Chrome/Edge desktop e Android, geralmente funciona.
+- Nem todos os navegadores suportam `SpeechRecognition` nativamente. No Chrome/Edge desktop e Android, geralmente funciona — os demais caem no Whisper local.
 - Para melhor experiência, o TTS deve respeitar o sotaque configurado na persona.
 - O processamento de áudio nunca deve bloquear a thread principal.
 

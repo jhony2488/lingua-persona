@@ -53,6 +53,7 @@ A preferência do usuário (`settings.llmEngine`: `auto | webllm | ollama | loca
 - **Web Workers**: o WebLLM e a tokenização rodam fora da thread principal.
 - **Quantização**: modelos em 4 bits (q4f16) são o padrão.
 - **Download sob demanda**: pesos vêm do Hugging Face na primeira vez e ficam no Cache API/IndexedDB; `npm run download-models` permite self-hosting.
+- **Preload em background**: o `ModelPreloader` (`src/components/model-preloader.tsx`, montado no layout localizado) dispara `initWebLLM` em tempo ocioso ao abrir qualquer página, então a primeira resposta não espera o download. Respeita a preferência de engine (`ollama`/`local` pulam), a disponibilidade de WebGPU e `navigator.connection.saveData`. Um init falho limpa o singleton do engine, permitindo retry na próxima mensagem.
 
 ## Diferenças entre WebLLM e Ollama
 

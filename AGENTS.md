@@ -63,6 +63,8 @@ src/i18n/                 config, detect, get-dictionary, provider, dictionaries
 src/lib/local-db/         mobile sqlite layer (schema.sql.ts + local-api.ts)
 src/lib/llm/              client-side inference: router + engines (webllm worker,
                           ollama, local) + device-tier model selection
+src/lib/stt/              whisper fallback (worker + SpeechRecognitionLike
+                          adapter) when Web Speech API is missing
 src/modules/assistant/    prompt.ts (persona + CEFR level + model tier) +
                           assistant.service.ts (deterministic local fallback)
 src/lib/http/             withErrorHandler, parse, response helpers
