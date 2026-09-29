@@ -39,20 +39,41 @@ afterAll(async () => {
 });
 
 describe("POST /api/conversations/:id/messages", () => {
-  it("creates user message and assistant reply, returns 201", async () => {
+  it("creates a single user message, returns 201", async () => {
     const conversationId = await seedConversation();
     const res = await request(app)
       .post(`/api/conversations/${conversationId}/messages`)
       .send({ content: "Hello teacher!" });
 
     expect(res.status).toBe(201);
-    expect(res.body.userMessage).toMatchObject({
+    expect(res.body).toMatchObject({
       conversationId,
       role: "user",
       content: "Hello teacher!",
     });
-    expect(res.body.assistantMessage.role).toBe("assistant");
-    expect(res.body.assistantMessage.content).toContain("placeholder");
+  });
+
+  it("persists an assistant reply sent by the client", async () => {
+    const conversationId = await seedConversation();
+    const res = await request(app)
+      .post(`/api/conversations/${conversationId}/messages`)
+      .send({ content: "Great question!", role: "assistant" });
+
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({
+      conversationId,
+      role: "assistant",
+      content: "Great question!",
+    });
+  });
+
+  it("returns 422 for an invalid role", async () => {
+    const conversationId = await seedConversation();
+    const res = await request(app)
+      .post(`/api/conversations/${conversationId}/messages`)
+      .send({ content: "Hi", role: "system" });
+
+    expect(res.status).toBe(422);
   });
 
   it("returns 404 when conversation does not exist", async () => {
@@ -80,6 +101,9 @@ describe("GET /api/conversations/:id/messages", () => {
     await request(app)
       .post(`/api/conversations/${conversationId}/messages`)
       .send({ content: "First" });
+    await request(app)
+      .post(`/api/conversations/${conversationId}/messages`)
+      .send({ content: "Reply", role: "assistant" });
 
     const res = await request(app).get(
       `/api/conversations/${conversationId}/messages`,

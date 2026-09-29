@@ -53,35 +53,52 @@ describe("messageService", () => {
     });
   });
 
-  it("creates user + assistant messages", async () => {
+  it("persists a single message with the given role", async () => {
     convRepo.findById.mockResolvedValue(conversation);
-    msgRepo.create
-      .mockResolvedValueOnce(userMessage)
-      .mockResolvedValueOnce(assistantMessage);
+    msgRepo.create.mockResolvedValue(assistantMessage);
 
-    const result = await messageService.create("c_1", { content: "Hello!" });
+    const result = await messageService.create("c_1", {
+      content: "Nice!",
+      role: "assistant",
+    });
 
-    expect(result.userMessage.role).toBe("user");
-    expect(result.assistantMessage.role).toBe("assistant");
-    expect(msgRepo.create).toHaveBeenNthCalledWith(1, {
+    expect(result.role).toBe("assistant");
+    expect(msgRepo.create).toHaveBeenCalledWith({
+      conversationId: "c_1",
+      role: "assistant",
+      content: "Nice!",
+    });
+  });
+
+  it("persists a user message by default", async () => {
+    convRepo.findById.mockResolvedValue(conversation);
+    msgRepo.create.mockResolvedValue(userMessage);
+
+    const result = await messageService.create("c_1", {
+      content: "Hello!",
+      role: "user",
+    });
+
+    expect(result.role).toBe("user");
+    expect(msgRepo.create).toHaveBeenCalledWith({
       conversationId: "c_1",
       role: "user",
       content: "Hello!",
     });
-    expect(msgRepo.create).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({
-        conversationId: "c_1",
-        role: "assistant",
-      }),
-    );
+  });
+
+  it("throws 404 when creating a message for a missing conversation", async () => {
+    convRepo.findById.mockResolvedValue(null);
+    await expect(
+      messageService.create("missing", { content: "Hi", role: "user" }),
+    ).rejects.toMatchObject({ statusCode: 404 });
   });
 });
 
-describe("generateAssistantReply", () => {
-  it("returns a pedagogical placeholder", () => {
+describe("generateAssistantReply (local fallback)", () => {
+  it("returns a deterministic offline reply with the level", () => {
     const reply = generateAssistantReply("Hello", "B2");
     expect(reply).toContain("B2");
-    expect(reply).toContain("placeholder");
+    expect(reply).toContain("offline mode");
   });
 });

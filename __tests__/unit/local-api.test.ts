@@ -55,12 +55,27 @@ describe("localApi (mobile sqlite layer)", () => {
     ).rejects.toMatchObject({ status: 404 });
   });
 
-  it("sendMessage persists user + assistant messages", async () => {
-    mockDb.query.mockResolvedValueOnce({ values: [{ level: "B1" }] });
-    const result = await localApi.sendMessage("c_1", "Hello!");
-    expect(result.userMessage.role).toBe("user");
-    expect(result.assistantMessage.role).toBe("assistant");
-    expect(result.assistantMessage.content).toContain("placeholder");
-    expect(mockDb.run).toHaveBeenCalledTimes(2);
+  it("createMessage persists a single message with the given role", async () => {
+    mockDb.query.mockResolvedValueOnce({ values: [{ id: "c_1" }] });
+    const message = await localApi.createMessage("c_1", {
+      content: "Hello!",
+      role: "assistant",
+    });
+    expect(message.role).toBe("assistant");
+    expect(message.content).toBe("Hello!");
+    expect(mockDb.run).toHaveBeenCalledTimes(1);
+  });
+
+  it("createMessage defaults role to user", async () => {
+    mockDb.query.mockResolvedValueOnce({ values: [{ id: "c_1" }] });
+    const message = await localApi.createMessage("c_1", { content: "Hi" });
+    expect(message.role).toBe("user");
+  });
+
+  it("createMessage returns 404 when conversation is missing", async () => {
+    mockDb.query.mockResolvedValueOnce({ values: [] });
+    await expect(
+      localApi.createMessage("missing", { content: "Hi" }),
+    ).rejects.toMatchObject({ status: 404 });
   });
 });

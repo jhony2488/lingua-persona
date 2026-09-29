@@ -2,7 +2,8 @@ import { test, expect, urls, seedProfile, goto } from "./fixtures";
 
 test.describe("Chat", () => {
   test.beforeEach(async ({ page, userId }) => {
-    await seedProfile(page, userId);
+    // Engine "local" → resposta determinística, sem depender de GPU/modelo no CI.
+    await seedProfile(page, userId, { llmEngine: "local" });
   });
 
   test("creates a new empty conversation", async ({ page }) => {
@@ -26,7 +27,7 @@ test.describe("Chat", () => {
 
     const messages = page.locator("main").getByText("Hello, teacher!");
     await expect(messages.first()).toBeVisible();
-    await expect(page.getByText(/placeholder/i).first()).toBeVisible({
+    await expect(page.getByText(/offline mode/i).first()).toBeVisible({
       timeout: 15000,
     });
   });
