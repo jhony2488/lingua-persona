@@ -10,21 +10,26 @@ O [WebLLM](https://github.com/mlc-ai/web-llm) executa modelos de linguagem diret
 // src/lib/llm/webllm.engine.ts — simplificado
 const engine = await CreateWebWorkerMLCEngine(worker, modelId, {
   appConfig, // /models/* se houver manifest local, senão Hugging Face
-  initProgressCallback: (report) => store.setProgress(report.progress, report.text),
+  initProgressCallback: (report) =>
+    store.setProgress(report.progress, report.text),
 });
-const completion = await engine.chat.completions.create({ messages, temperature, max_tokens });
+const completion = await engine.chat.completions.create({
+  messages,
+  temperature,
+  max_tokens,
+});
 ```
 
 ### Seleção de modelo por dispositivo
 
 O modelo é escolhido automaticamente pela capacidade do dispositivo (`detectDeviceCapabilities` em `src/lib/llm/models.ts`): `navigator.deviceMemory`, `hardwareConcurrency` e heurística mobile (rebaixa um tier no Capacitor/UA móvel). O usuário pode sobrescrever pelo seletor no header do chat.
 
-| Tier   | Modelo                              | Tamanho | Perfil                            |
-| ------ | ----------------------------------- | ------- | --------------------------------- |
-| tiny   | `SmolLM2-360M-Instruct-q4f32_1-MLC` | ~270 MB | Dispositivos fracos, sem GPU      |
-| small  | `Llama-3.2-1B-Instruct-q4f16_1-MLC` | ~800 MB | Tablets e notebooks comuns        |
-| medium | `Qwen2.5-1.5B-Instruct-q4f16_1-MLC` | ~1,1 GB | Notebooks melhores                |
-| large  | `Llama-3.2-3B-Instruct-q4f16_1-MLC` | ~2 GB   | Desktop com GPU dedicada          |
+| Tier   | Modelo                              | Tamanho | Perfil                       |
+| ------ | ----------------------------------- | ------- | ---------------------------- |
+| tiny   | `SmolLM2-360M-Instruct-q4f32_1-MLC` | ~270 MB | Dispositivos fracos, sem GPU |
+| small  | `Llama-3.2-1B-Instruct-q4f16_1-MLC` | ~800 MB | Tablets e notebooks comuns   |
+| medium | `Qwen2.5-1.5B-Instruct-q4f16_1-MLC` | ~1,1 GB | Notebooks melhores           |
+| large  | `Llama-3.2-3B-Instruct-q4f16_1-MLC` | ~2 GB   | Desktop com GPU dedicada     |
 
 Cada tier carrega seu próprio orçamento: `maxHistory` (4–12 mensagens), `maxTokens` (256–512) e `temperature` — ver `LLM_MODELS`.
 
@@ -51,12 +56,12 @@ A preferência do usuário (`settings.llmEngine`: `auto | webllm | ollama | loca
 
 ## Diferenças entre WebLLM e Ollama
 
-| Aspecto       | WebLLM                    | Ollama                        |
-| ------------- | ------------------------- | ----------------------------- |
-| Local         | No navegador              | Servidor local                |
-| Hardware      | WebGPU                    | CPU/GPU local                 |
-| System prompt | `messages[0]` (system)    | `messages[0]` (system)        |
-| Cache         | KV cache do motor         | KV cache do llama.cpp         |
+| Aspecto       | WebLLM                 | Ollama                 |
+| ------------- | ---------------------- | ---------------------- |
+| Local         | No navegador           | Servidor local         |
+| Hardware      | WebGPU                 | CPU/GPU local          |
+| System prompt | `messages[0]` (system) | `messages[0]` (system) |
+| Cache         | KV cache do motor      | KV cache do llama.cpp  |
 
 ## Veja também
 

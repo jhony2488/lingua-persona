@@ -10,21 +10,26 @@ The inference engine picks and runs the most suitable language model for the use
 // src/lib/llm/webllm.engine.ts — simplified
 const engine = await CreateWebWorkerMLCEngine(worker, modelId, {
   appConfig, // /models/* when a local manifest exists, else Hugging Face
-  initProgressCallback: (report) => store.setProgress(report.progress, report.text),
+  initProgressCallback: (report) =>
+    store.setProgress(report.progress, report.text),
 });
-const completion = await engine.chat.completions.create({ messages, temperature, max_tokens });
+const completion = await engine.chat.completions.create({
+  messages,
+  temperature,
+  max_tokens,
+});
 ```
 
 ### Device-aware model selection
 
 The model is chosen automatically from device capability (`detectDeviceCapabilities` in `src/lib/llm/models.ts`): `navigator.deviceMemory`, `hardwareConcurrency`, and a mobile heuristic (Capacitor/mobile UA downgrades one tier). The user can override it in the chat header selector.
 
-| Tier   | Model                               | Size     | Device profile                     |
-| ------ | ----------------------------------- | -------- | ---------------------------------- |
-| tiny   | `SmolLM2-360M-Instruct-q4f32_1-MLC` | ~270 MB  | Weak devices, no dedicated GPU     |
-| small  | `Llama-3.2-1B-Instruct-q4f16_1-MLC` | ~800 MB  | Tablets and common notebooks       |
-| medium | `Qwen2.5-1.5B-Instruct-q4f16_1-MLC` | ~1.1 GB  | Better notebooks                   |
-| large  | `Llama-3.2-3B-Instruct-q4f16_1-MLC` | ~2 GB    | Desktop with dedicated GPU         |
+| Tier   | Model                               | Size    | Device profile                 |
+| ------ | ----------------------------------- | ------- | ------------------------------ |
+| tiny   | `SmolLM2-360M-Instruct-q4f32_1-MLC` | ~270 MB | Weak devices, no dedicated GPU |
+| small  | `Llama-3.2-1B-Instruct-q4f16_1-MLC` | ~800 MB | Tablets and common notebooks   |
+| medium | `Qwen2.5-1.5B-Instruct-q4f16_1-MLC` | ~1.1 GB | Better notebooks               |
+| large  | `Llama-3.2-3B-Instruct-q4f16_1-MLC` | ~2 GB   | Desktop with dedicated GPU     |
 
 Each tier carries its own budget: `maxHistory` (4–12 messages), `maxTokens` (256–512), and `temperature` — see `LLM_MODELS`.
 
@@ -51,12 +56,12 @@ The user's preference (`settings.llmEngine`: `auto | webllm | ollama | local`) c
 
 ## WebLLM vs Ollama
 
-| Aspect        | WebLLM                 | Ollama                       |
-| ------------- | ---------------------- | ---------------------------- |
-| Location      | In the browser         | Local server                 |
-| Hardware      | WebGPU                 | Local CPU/GPU                |
-| System prompt | `messages[0]` (system) | `messages[0]` (system)       |
-| Cache         | Engine KV cache        | llama.cpp KV cache           |
+| Aspect        | WebLLM                 | Ollama                 |
+| ------------- | ---------------------- | ---------------------- |
+| Location      | In the browser         | Local server           |
+| Hardware      | WebGPU                 | Local CPU/GPU          |
+| System prompt | `messages[0]` (system) | `messages[0]` (system) |
+| Cache         | Engine KV cache        | llama.cpp KV cache     |
 
 ## See also
 
