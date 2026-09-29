@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -45,14 +45,18 @@ export default function SettingsPage() {
     setAgentGender,
     setTourCompleted,
   } = useSettings();
-  // Inicializa como "unsupported" para casar com o SSR — a permissão real só
-  // existe no cliente e é sincronizada no efeito (evita hydration mismatch).
-  const [permission, setPermission] = useState<
-    NotificationPermission | "unsupported"
-  >("unsupported");
-  useEffect(() => {
-    setPermission(getNotificationPermission());
-  }, []);
+  // true apenas no cliente — Notification.permission não existe no SSR e
+  // lê-la no estado inicial causaria hydration mismatch.
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  const [requested, setRequested] = useState<
+    NotificationPermission | "unsupported" | null
+  >(null);
+  const permission =
+    requested ?? (mounted ? getNotificationPermission() : "unsupported");
 
   const permissionLabel = {
     granted: dict.settings.permissionGranted,
@@ -151,7 +155,7 @@ export default function SettingsPage() {
               size="sm"
               disabled={permission === "unsupported"}
               onClick={async () =>
-                setPermission(await requestNotificationPermission())
+                setRequested(await requestNotificationPermission())
               }
             >
               {dict.settings.enable}
