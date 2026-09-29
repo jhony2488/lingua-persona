@@ -112,7 +112,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # ubuntu-22.04: linuxdeploy (AppImage) quebra em 24.04 e AppImage deve
+        # ser buildado na distro mais antiga suportada (glibc).
+        os: [ubuntu-22.04, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -128,13 +130,12 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Deps Linux (webkit2gtk + fuse para linuxdeploy)
-        if: matrix.os == 'ubuntu-latest'
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev \
             librsvg2-dev patchelf fuse
-          # ubuntu-24.04 renomeou libfuse2 → libfuse2t64
-          sudo apt-get install -y libfuse2t64 || sudo apt-get install -y libfuse2
+          sudo apt-get install -y libfuse2 || sudo apt-get install -y libfuse2t64
 
       - name: Instalar Dependências
         run: npm ci
@@ -173,7 +174,8 @@ jobs:
       # Certificado Authenticode: Windows
 
       - name: Build Tauri bundles
-        run: npx tauri build
+        # --verbose: expõe o stderr do linuxdeploy se o bundling falhar
+        run: npx tauri build --verbose
         env:
           # linuxdeploy é um AppImage — extract-and-run contorna falta de FUSE
           APPIMAGE_EXTRACT_AND_RUN: "1"
