@@ -18,5 +18,8 @@ export default defineConfig({
     url: "http://localhost:3000/api/health",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // Garante o app completo no e2e mesmo com LANDING_PAGE=1 no .env local
+    // (env do processo tem precedência sobre .env no Next.js).
+    env: { LANDING_PAGE: "0" },
   },
 });

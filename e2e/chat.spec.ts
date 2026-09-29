@@ -26,9 +26,10 @@ test.describe("Chat", () => {
     await page.getByRole("button", { name: "Send message" }).click();
 
     const messages = page.locator("main").getByText("Hello, teacher!");
-    await expect(messages.first()).toBeVisible();
+    // Primeira resposta pode demorar: dev compila a cadeia llm/ sob demanda.
+    await expect(messages.first()).toBeVisible({ timeout: 30000 });
     await expect(page.getByText(/offline mode/i).first()).toBeVisible({
-      timeout: 15000,
+      timeout: 30000,
     });
   });
 
