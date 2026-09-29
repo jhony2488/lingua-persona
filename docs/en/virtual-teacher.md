@@ -2,6 +2,10 @@
 
 The LinguaPersona agent also acts as a virtual English teacher, integrating grammar, vocabulary, and speaking practice by voice and text. Teaching is structured from **A1 (Starter)** to **C2 (Advanced)**, with dynamic complexity adjustment.
 
+> The per-level instructions below are injected into the system prompt by
+> `buildSystemPrompt` (`src/modules/assistant/prompt.ts`), combined with
+> simplified rules according to the tier of the model in use.
+
 ## Proficiency levels
 
 | Level                       | Grammar focus                                                     | Conversation focus                                            | Agent behavior                                                                                                |

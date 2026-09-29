@@ -1,10 +1,14 @@
 # Local models
 
-To make WebLLM work offline and avoid rate limits, models are hosted locally in the `public/models/` folder and downloaded with a script.
+WebLLM resolves model weights at runtime, in this order:
 
-## Download script
+1. **`public/models/`** — if `public/models/manifest.json` exists and contains the `modelId`, files are served locally (`/models/<id>/resolve/main/...`), enabling fully offline first use.
+2. **Hugging Face** — without a local manifest, `prebuiltAppConfig` downloads from HF on first run and WebLLM stores it in the browser/webview **Cache API / IndexedDB** for offline reuse.
+3. **Fallback** — if the download fails, the engine chain takes over (Ollama → local), see [Inference engine](inference-engine.md).
 
-The `scripts/download-mlc-models.mjs` script downloads the files for each model from the Hugging Face repository.
+## Download script (optional self-hosting)
+
+The `scripts/download-mlc-models.mjs` script downloads each model's files from Hugging Face into `public/models/` and generates the `manifest.json` the runtime uses to detect self-hosting.
 
 ### Default models
 
@@ -25,39 +29,24 @@ const MODEL_IDS = [
 npm run download-models
 ```
 
-Add the script to `package.json`:
+At the end, the script writes `public/models/manifest.json` in the format
+`{ "models": [{ "modelId": "...", "modelLib": "....wasm" }] }`.
 
-```json
-{
-  "scripts": {
-    "download-models": "node scripts/download-mlc-models.mjs",
-    "prebuild": "npm run download-models"
-  }
-}
-```
+> **Size warning**: bundling models in `public/models/` inflates the
+> installer (270 MB–2 GB per model). The recommended default is on-demand
+> download from Hugging Face — use the script only if you need fully
+> offline first use.
 
 ## Browser storage
 
-On first run, WebLLM loads the files from the server and stores them in the browser's **Cache API / IndexedDB**. On subsequent runs, models are read from local cache, enabling offline use.
+On first run via HF, WebLLM downloads the files and stores them in the browser's **Cache API / IndexedDB**. Subsequent runs read from the local cache, enabling offline use.
 
-### Local URLs
-
-With models in `/public/models/`, WebLLM accesses `http://localhost:3000/models/{modelId}/resolve/main/...` instead of fetching from Hugging Face.
-
-## Cache management
-
-The UI can offer:
-
-- Button to "Download for offline use".
-- Indicator of used space.
-- Option to remove a model from cache.
-
-## Complete flow
+## Full flow (self-hosted)
 
 1. Developer runs `npm run download-models`.
-2. `.wasm` and `.bin` files go to `public/models/`.
-3. Static build (`out/`) packages the models.
-4. On the user's device, the app caches them for offline use.
+2. `.bin`/config files go to `public/models/<id>/resolve/main/` and the `.wasm` to `public/models/libs/`; `manifest.json` is generated.
+3. Static export (`out/`) and standalone builds package the models inside `public/`.
+4. On the user's device, the app detects the manifest and serves locally.
 
 ## See also
 

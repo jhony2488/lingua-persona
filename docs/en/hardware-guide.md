@@ -88,7 +88,7 @@ Any local server with an **OpenAI-compatible** API works as a backend: [LM Studi
 
 ## WebLLM (browser)
 
-MLC models run on the browser's GPU via WebGPU, with no installation. Recap:
+MLC models run on the browser's GPU via WebGPU, with no installation. The app auto-detects device capability (`deviceMemory`/`hardwareConcurrency`/mobile) and picks the right model — the table below is what the detection uses as reference. Recap:
 
 | Model                               | Approximate size | Device profile                                |
 | ----------------------------------- | ---------------- | --------------------------------------------- |

@@ -89,7 +89,7 @@ Qualquer servidor local com API **OpenAI-compatible** funciona como backend: [LM
 
 ## WebLLM (navegador)
 
-Os modelos MLC rodam na GPU do navegador via WebGPU, sem instalar nada. Recapitulação:
+Os modelos MLC rodam na GPU do navegador via WebGPU, sem instalar nada. O app detecta a capacidade do dispositivo automaticamente (`deviceMemory`/`hardwareConcurrency`/mobile) e escolhe o modelo adequado — a tabela abaixo é o que a detecção usa como referência. Recapitulação:
 
 | Modelo                              | Tamanho aproximado | Perfil do dispositivo                   |
 | ----------------------------------- | ------------------ | --------------------------------------- |

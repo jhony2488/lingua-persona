@@ -21,6 +21,8 @@ SQLite. No external server required for native builds.
 - Tailwind CSS v4 + Base UI (shadcn preset) — `buttonVariants` on links, no
   `asChild`
 - Prisma + SQLite · Zod · TanStack Query · Zustand
+- `@mlc-ai/web-llm` — inferência no cliente via WebGPU (worker); fallback
+  Ollama → resposta local (`src/lib/llm/`)
 - Serwist (PWA service worker via `/serwist/[path]`)
 - Jest + React Testing Library + Supertest + MSW
 - Capacitor (Android/iOS) · Tauri (desktop) · `@capacitor-community/sqlite`
@@ -45,6 +47,7 @@ npm run mobile:sync       # cap sync
 npm run build:standalone  # complete .next/standalone (static, public, data, .prisma)
 npm run sidecar:bin       # download Node binary for Tauri sidecar
 npm run fetch:books       # download the bundled book corpus → data/library/
+npm run download-models   # self-host WebLLM weights → public/models/ (+manifest.json)
 ```
 
 ## Structure
@@ -58,6 +61,10 @@ src/modules/<domain>/     schema.ts (zod) · service.ts · repository.ts
 src/modules/study/        + plan-generator.ts, topics.data.ts (shared, pure)
 src/i18n/                 config, detect, get-dictionary, provider, dictionaries/
 src/lib/local-db/         mobile sqlite layer (schema.sql.ts + local-api.ts)
+src/lib/llm/              client-side inference: router + engines (webllm worker,
+                          ollama, local) + device-tier model selection
+src/modules/assistant/    prompt.ts (persona + CEFR level + model tier) +
+                          assistant.service.ts (deterministic local fallback)
 src/lib/http/             withErrorHandler, parse, response helpers
 src/lib/store/settings.ts user prefs (userId, level, dialect, agent, chatMode)
 src/proxy.ts              locale negotiation (negotiator + localematcher)

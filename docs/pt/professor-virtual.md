@@ -2,6 +2,10 @@
 
 O agente do LinguaPersona também atua como professor virtual de inglês, integrando gramática, vocabulário e prática de conversação por voz e texto. O ensino é estruturado do nível **A1 (Starter)** ao **C2 (Advanced)**, com ajuste dinâmico de complexidade.
 
+> As instruções por nível abaixo são injetadas no system prompt pelo
+> `buildSystemPrompt` (`src/modules/assistant/prompt.ts`), combinadas com
+> regras simplificadas conforme o tier do modelo em uso.
+
 ## Níveis de proficiência
 
 | Nível                       | Foco gramatical                                                        | Foco em conversação                                             | Comportamento do agente                                                                 |
