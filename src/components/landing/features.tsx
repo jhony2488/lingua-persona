@@ -19,10 +19,10 @@ export function Features({ dict }: { dict: Dictionary }) {
         return (
           <Card
             key={feature.title}
-            className="hover:border-primary/30 p-5 transition-colors"
+            className="group hover:border-primary/30 p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
           >
-            <div className="bg-muted mb-3 flex size-9 items-center justify-center rounded-lg">
-              <Icon className="size-4.5" />
+            <div className="bg-muted group-hover:bg-primary/10 mb-3 flex size-9 items-center justify-center rounded-lg transition-colors">
+              <Icon className="group-hover:text-primary size-4.5 transition-colors" />
             </div>
             <h3 className="font-semibold">{feature.title}</h3>
             <p className="text-muted-foreground mt-1.5 text-sm">

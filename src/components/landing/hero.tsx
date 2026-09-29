@@ -8,7 +8,7 @@ function ChatMock({ dict }: { dict: Dictionary }) {
   return (
     <div
       aria-hidden="true"
-      className="bg-card w-full max-w-sm rounded-xl border p-4 text-left text-sm shadow-lg"
+      className="bg-card w-full max-w-sm rounded-xl border p-4 text-left text-sm shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
     >
       <div className="flex flex-col gap-3">
         <p className="bg-primary text-primary-foreground ml-8 rounded-lg rounded-br-sm px-3 py-2">
@@ -37,7 +37,7 @@ export function Hero({ dict }: { dict: Dictionary }) {
 
       <div className="flex flex-col items-center gap-10 px-6 py-16 text-center sm:py-20 lg:flex-row lg:justify-between lg:text-left">
         <div className="flex max-w-xl flex-col items-center gap-5 lg:items-start">
-          <span className="bg-muted text-muted-foreground rounded-full border px-3 py-1 text-xs font-medium">
+          <span className="rounded-full bg-gradient-to-r from-blue-600 via-cyan-500 to-violet-600 px-3 py-1 text-xs font-medium text-white shadow-sm">
             {dict.landing.eyebrow}
           </span>
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
