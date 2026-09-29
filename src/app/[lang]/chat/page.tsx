@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AudioLines, MessageSquare } from "lucide-react";
 import { useState, type ComponentType } from "react";
 import { ConversationList } from "@/components/chat/conversation-list";
+import { EngineStatus } from "@/components/chat/engine-status";
 import { MessageInput } from "@/components/chat/message-input";
 import { MessageList } from "@/components/chat/message-list";
 import { OnboardingDialog } from "@/components/chat/onboarding-dialog";
@@ -39,7 +40,13 @@ export default function ChatPage() {
   });
 
   const sendMutation = useMutation({
-    mutationFn: (content: string) => api.sendMessage(selectedId ?? "", content),
+    mutationFn: (content: string) => {
+      const conversation = conversations.find((c) => c.id === selectedId);
+      return api.sendMessage(selectedId ?? "", content, {
+        level: conversation?.level,
+        dialect: conversation?.dialect,
+      });
+    },
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["messages", selectedId] }),
   });
@@ -66,7 +73,8 @@ export default function ChatPage() {
         <ConversationList selectedId={selectedId} onSelect={setSelectedId} />
 
         <Card className="flex min-h-[60vh] flex-1 flex-col overflow-hidden">
-          <div className="flex items-center justify-end border-b px-3 py-2">
+          <div className="flex items-center justify-between gap-2 border-b px-3 py-2">
+            <EngineStatus />
             <ModeToggle mode={chatMode} onChange={setChatMode} />
           </div>
 

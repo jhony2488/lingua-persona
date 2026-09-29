@@ -17,6 +17,7 @@ import {
   stopSpeaking,
   type SpeechRecognitionLike,
 } from "@/lib/speech";
+import { stripForSpeech } from "@/modules/assistant/prompt";
 import { useSettings } from "@/lib/store/settings";
 import { cn } from "@/lib/utils";
 
@@ -157,7 +158,7 @@ export function VoiceMode({
         return;
       }
       setStatusSynced("speaking");
-      speak(reply, {
+      speak(stripForSpeech(reply), {
         dialect,
         gender: agentGender,
         onEnd: () => {
