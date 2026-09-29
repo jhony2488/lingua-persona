@@ -53,10 +53,7 @@ const DIALECT_INSTRUCTIONS: Record<string, string> = {
   UK: `Use British English (UK) spelling, vocabulary, idioms and expressions (colour, organise, flat, pavement, brilliant, mate).`,
 };
 
-export function buildSystemPrompt(
-  ctx: ChatContext,
-  tier: ModelTier,
-): string {
+export function buildSystemPrompt(ctx: ChatContext, tier: ModelTier): string {
   const levelInstructions =
     LEVEL_INSTRUCTIONS[ctx.level] ?? LEVEL_INSTRUCTIONS.A1;
   const dialectInstruction =

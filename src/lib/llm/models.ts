@@ -77,13 +77,11 @@ export interface DeviceCapabilities {
   isMobile: boolean;
 }
 
-export function detectDeviceCapabilities(
-  nav?: {
-    deviceMemory?: number;
-    hardwareConcurrency?: number;
-    userAgent?: string;
-  },
-): DeviceCapabilities {
+export function detectDeviceCapabilities(nav?: {
+  deviceMemory?: number;
+  hardwareConcurrency?: number;
+  userAgent?: string;
+}): DeviceCapabilities {
   const source =
     nav ??
     (typeof navigator !== "undefined"
@@ -95,7 +93,8 @@ export function detectDeviceCapabilities(
       : undefined);
   const userAgent = source?.userAgent ?? "";
   const isMobile =
-    Capacitor.isNativePlatform() || /Android|iPhone|iPad|Mobile/i.test(userAgent);
+    Capacitor.isNativePlatform() ||
+    /Android|iPhone|iPad|Mobile/i.test(userAgent);
   return {
     deviceMemoryGB: source?.deviceMemory ?? null,
     hardwareConcurrency: source?.hardwareConcurrency ?? null,
