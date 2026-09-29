@@ -66,7 +66,12 @@ export function ModelPreloader() {
       warmSTT();
     };
 
-    const idle = window.requestIdleCallback;
+    // requestIdleCallback não existe no Safari — fallback para setTimeout.
+    const idle = (
+      window as {
+        requestIdleCallback?: Window["requestIdleCallback"];
+      }
+    ).requestIdleCallback;
     const id = idle
       ? idle(run, { timeout: 4000 })
       : (setTimeout(run, 1500) as unknown as number);

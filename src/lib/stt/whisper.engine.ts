@@ -76,22 +76,16 @@ export function initWhisper(
   progressCallback = onProgress ?? null;
   initPromise ??= new Promise<void>((resolve, reject) => {
     const w = ensureWorker();
-    const prev = w.onmessage;
-    w.onmessage = (event: MessageEvent<WhisperWorkerResponse>) => {
+    const listener = (event: MessageEvent<WhisperWorkerResponse>) => {
       if (event.data.type === "ready") {
-        w.onmessage = prev;
-        // Restaura o handler padrão sem perder a mensagem ready.
-        w.onmessage?.(event);
+        w.removeEventListener("message", listener);
         resolve();
-        return;
-      }
-      if (event.data.type === "error") {
-        w.onmessage = prev;
+      } else if (event.data.type === "error") {
+        w.removeEventListener("message", listener);
         reject(new Error(event.data.message));
-        return;
       }
-      prev?.(event);
     };
+    w.addEventListener("message", listener);
     send({ type: "init" });
   });
   // Init falho não envenena o singleton — próxima chamada tenta de novo.
