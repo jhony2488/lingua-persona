@@ -180,14 +180,20 @@ jobs:
           # linuxdeploy é um AppImage — extract-and-run contorna falta de FUSE
           APPIMAGE_EXTRACT_AND_RUN: "1"
 
+      # Apenas instaladores: o bundle/ também contém árvores explodidas
+      # (.app, buildroot do deb/rpm) com o node_modules do sidecar — subir
+      # o diretório inteiro polui a release e colide nomes de assets.
       - name: Upload artefatos desktop
         uses: actions/upload-artifact@v4
         with:
           name: desktop-${{ matrix.os }}
           path: |
-            src-tauri/target/release/bundle/
-            src-tauri/target/release/*.exe
-            src-tauri/target/release/linguapersona
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.exe
+            src-tauri/target/release/bundle/**/*.AppImage
+            src-tauri/target/release/bundle/**/*.deb
+            src-tauri/target/release/bundle/**/*.rpm
+            src-tauri/target/release/bundle/**/*.dmg
           if-no-files-found: warn
 
   # ---------------------------------------------------------------
@@ -219,5 +225,6 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
