@@ -106,58 +106,6 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
   # ---------------------------------------------------------------
-  # iOS: UI exportada + dados locais (unsigned — .ipa precisa de certs)
-  # ---------------------------------------------------------------
-  build-ios:
-    runs-on: macos-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: "npm"
-
-      - name: Instalar Dependências
-        run: npm ci
-
-      - name: Build estático para webview
-        run: npm run build:mobile
-
-      - name: Sincronizar Capacitor (iOS)
-        run: |
-          npx cap add ios
-          npx cap sync ios
-
-      # O .xcworkspace só é criado pelo pod install — garante explicitamente.
-      - name: Instalar CocoaPods dependencies
-        run: cd ios/App && pod install --repo-update
-
-      - name: Build iOS (unsigned, simulator)
-        run: |
-          cd ios/App
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Debug \
-            -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO \
-            build
-          mkdir -p "$GITHUB_WORKSPACE/ios-artifact"
-          cp -R "build/Build/Products/Debug-iphonesimulator/App.app" \
-            "$GITHUB_WORKSPACE/ios-artifact/LinguaPersona.app"
-
-      # --- Assinatura .ipa (descomente após configurar secrets Apple) ---
-
-      - name: Upload app iOS
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios
-          path: ios-artifact/LinguaPersona.app
-
-  # ---------------------------------------------------------------
   # Desktop: Tauri + sidecar Node (app 100% local, localhost:3111)
   # ---------------------------------------------------------------
   build-desktop:
@@ -239,7 +187,7 @@ jobs:
   # Release: agrega todos os artefatos + checksum
   # ---------------------------------------------------------------
   release:
-    needs: [build-web, build-android, build-ios, build-desktop]
+    needs: [build-web, build-android, build-desktop]
     runs-on: ubuntu-latest
     permissions:
       contents: write # Permissão necessária para criar a Release no GitHub

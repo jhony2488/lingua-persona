@@ -52,8 +52,8 @@ Two workflows in `.github/workflows/`:
 - `release.yml` — on `v*.*.*` tags:
   - **web**: `.pk` (static) + `.rxe` (.next)
   - **android**: `build:mobile` → `cap sync` → `app-debug.apk`
-  - **ios**: `build:mobile` → `cap sync` → `LinguaPersona.app` (unsigned)
   - **desktop**: standalone → Node sidecar binary → `tauri build` (`.msi`/`.dmg`/`.deb`)
+  - iOS has no CI artifact — a physical device requires Apple signing; build locally via `npx cap open ios` + Xcode
   - aggregates everything + `SHA256SUMS.txt` → GitHub Release
 
 ## Native scripts
@@ -67,12 +67,12 @@ Two workflows in `.github/workflows/`:
 
 ## Build matrix
 
-| Platform | Technology                        | Output                             |
-| -------- | --------------------------------- | ---------------------------------- |
-| Web/PWA  | Next.js standalone + Serwist      | `.next/` + `app-release.pk`/`.rxe` |
-| Android  | Capacitor + local sqlite          | `app-debug.apk` (unsigned)         |
-| iOS      | Capacitor + local sqlite          | `LinguaPersona.app` (unsigned)     |
-| Desktop  | Tauri + Node sidecar (standalone) | `.msi`/`.dmg`/`.deb` (unsigned)    |
+| Platform | Technology                        | Output                                         |
+| -------- | --------------------------------- | ---------------------------------------------- |
+| Web/PWA  | Next.js standalone + Serwist      | `.next/` + `app-release.pk`/`.rxe`             |
+| Android  | Capacitor + local sqlite          | `app-debug.apk` (unsigned)                     |
+| iOS      | Capacitor + local sqlite          | local build via Xcode (requires Apple signing) |
+| Desktop  | Tauri + Node sidecar (standalone) | `.msi`/`.dmg`/`.deb` (unsigned)                |
 
 ## Capacitor steps
 
