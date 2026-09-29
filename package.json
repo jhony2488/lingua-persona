@@ -28,7 +28,8 @@
     "fetch:books": "node scripts/fetch-books.mjs",
     "build:standalone": "node scripts/build-standalone.mjs",
     "sidecar:bin": "node scripts/fetch-node-bin.mjs",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

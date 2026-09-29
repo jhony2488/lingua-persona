@@ -1,42 +1,66 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { PNG } from "pngjs";
+import sharp from "sharp";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const logoPath = join(root, "public", "logo.png");
 const outDir = join(root, "public", "icons");
 
-const BG = { r: 0x4f, g: 0x46, b: 0xe5 }; // indigo-600
-const FG = { r: 0xff, g: 0xff, b: 0xff };
+// Gradiente da logo: azul → ciano → violeta (diagonal).
+const gradientBg = (size) =>
+  Buffer.from(
+    `<svg width="${size}" height="${size}">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#2563eb"/>
+          <stop offset="0.5" stop-color="#06b6d4"/>
+          <stop offset="1" stop-color="#6d28d9"/>
+        </linearGradient>
+      </defs>
+      <rect width="${size}" height="${size}" fill="url(#g)"/>
+    </svg>`,
+  );
 
-function drawIcon(size, circleRatio) {
-  const png = new PNG({ width: size, height: size });
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = (size / 2) * circleRatio;
-
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const idx = (size * y + x) << 2;
-      const inside = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) <= r;
-      const color = inside ? FG : BG;
-      png.data[idx] = color.r;
-      png.data[idx + 1] = color.g;
-      png.data[idx + 2] = color.b;
-      png.data[idx + 3] = 255;
-    }
-  }
-  return PNG.sync.write(png);
-}
-
-const icons = [
-  { name: "icon-192.png", size: 192, ratio: 0.7 },
-  { name: "icon-512.png", size: 512, ratio: 0.7 },
-  { name: "icon-maskable-512.png", size: 512, ratio: 0.55 },
-];
-
+const logo = sharp(logoPath);
 mkdirSync(outDir, { recursive: true });
-for (const icon of icons) {
-  writeFileSync(join(outDir, icon.name), drawIcon(icon.size, icon.ratio));
-  console.log(`generated ${icon.name}`);
+
+for (const size of [192, 512]) {
+  await logo
+    .clone()
+    .resize(size, size, {
+      fit: "contain",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
+    .png()
+    .toFile(join(outDir, `icon-${size}.png`));
+  console.log(`generated icon-${size}.png`);
 }
+
+// Maskable: zona segura é um círculo de ~80% — logo a 66% garante que a
+// ponta do balão não seja cortada ao aplicar máscara circular/squircle.
+const MASKABLE = 512;
+const inner = Math.round(MASKABLE * 0.66);
+const padded = await logo
+  .clone()
+  .resize(inner, inner, {
+    fit: "contain",
+    background: { r: 0, g: 0, b: 0, alpha: 0 },
+  })
+  .toBuffer();
+await sharp(gradientBg(MASKABLE))
+  .composite([{ input: padded, gravity: "center" }])
+  .png()
+  .toFile(join(outDir, "icon-maskable-512.png"));
+console.log("generated icon-maskable-512.png");
+
+// Favicon moderno — o Next serve src/app/icon.png junto do favicon.ico legado.
+await logo
+  .clone()
+  .resize(64, 64, {
+    fit: "contain",
+    background: { r: 0, g: 0, b: 0, alpha: 0 },
+  })
+  .png()
+  .toFile(join(root, "src", "app", "icon.png"));
+console.log("generated src/app/icon.png");
