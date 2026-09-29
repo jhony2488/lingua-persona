@@ -1,4 +1,4 @@
-import { cpSync, existsSync } from "node:fs";
+import { cpSync, existsSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -24,6 +24,18 @@ if (existsSync(prismaClient)) {
   cpSync(prismaClient, join(standalone, "node_modules", ".prisma"), {
     recursive: true,
   });
+}
+
+// O sharp (dep de @huggingface/transformers) instala variantes musl em
+// qualquer Linux x64 — são ELF musl que nem carregam em glibc, e o
+// linuxdeploy do Tauri falha ao resolver libc.musl nelas.
+const imgDir = join(standalone, "node_modules", "@img");
+if (existsSync(imgDir)) {
+  for (const entry of readdirSync(imgDir)) {
+    if (entry.includes("musl")) {
+      rmSync(join(imgDir, entry), { recursive: true, force: true });
+    }
+  }
 }
 
 console.log("✓ Standalone completo em .next/standalone");
