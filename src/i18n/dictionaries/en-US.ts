@@ -104,6 +104,8 @@ export const dictionary = {
     americanEnglish: "American English",
     britishEnglish: "British English",
     yourLevel: "Your level",
+    profileSaving: "Saving profile…",
+    profileSaveError: "Could not save to your profile. The change is kept on this device.",
     notifications: "Notifications",
     notificationsDescription:
       "Web Push support is prepared; permission state: {state}",

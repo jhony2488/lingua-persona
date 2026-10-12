@@ -11,6 +11,8 @@ model User {
   id               String         @id @default(cuid())
   email            String         @unique
   name             String
+  agentName        String         @default("Alex")
+  agentGender      String         @default("male")
   englishLevel     String         @default("A1")
   preferredDialect String         @default("US")
   createdAt        DateTime       @default(now())
