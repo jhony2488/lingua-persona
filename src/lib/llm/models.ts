@@ -58,6 +58,35 @@ export const LLM_MODELS: LLMModel[] = [
   },
 ];
 
+export interface WasmLLMModel extends LLMModel {
+  minHardwareConcurrency: number;
+}
+
+export const WASM_LLM_MODELS: WasmLLMModel[] = [
+  {
+    modelId: "onnx-community/Qwen2.5-0.5B-Instruct",
+    label: "Qwen 2.5 0.5B (WASM)",
+    sizeMB: 483,
+    tier: "tiny",
+    minDeviceMemoryGB: 4,
+    minHardwareConcurrency: 4,
+    maxHistory: 4,
+    maxTokens: 192,
+    temperature: 0.4,
+  },
+  {
+    modelId: "onnx-community/Qwen2.5-1.5B-Instruct",
+    label: "Qwen 2.5 1.5B (WASM)",
+    sizeMB: 1400,
+    tier: "medium",
+    minDeviceMemoryGB: 8,
+    minHardwareConcurrency: 6,
+    maxHistory: 6,
+    maxTokens: 256,
+    temperature: 0.5,
+  },
+];
+
 const TIER_ORDER: ModelTier[] = ["tiny", "small", "medium", "large"];
 
 /**
@@ -129,6 +158,51 @@ export function detectDeviceTier(caps: DeviceCapabilities): ModelTier {
 export function pickDefaultModel(caps?: DeviceCapabilities): LLMModel {
   const tier = detectDeviceTier(caps ?? detectDeviceCapabilities());
   return LLM_MODELS.find((model) => model.tier === tier) ?? LLM_MODELS[0];
+}
+
+export function canRunWasmModel(
+  model: WasmLLMModel,
+  caps: DeviceCapabilities,
+): boolean {
+  if (
+    model.tier !== "tiny" &&
+    (caps.deviceMemoryGB === null || caps.hardwareConcurrency === null)
+  ) {
+    return false;
+  }
+  if (
+    caps.deviceMemoryGB !== null &&
+    caps.deviceMemoryGB < model.minDeviceMemoryGB
+  ) {
+    return false;
+  }
+  if (
+    caps.hardwareConcurrency !== null &&
+    caps.hardwareConcurrency < model.minHardwareConcurrency
+  ) {
+    return false;
+  }
+  return caps.deviceMemoryGB !== null || caps.hardwareConcurrency !== null;
+}
+
+export function pickWasmModel(
+  caps: DeviceCapabilities,
+  preferredTier: ModelTier = detectDeviceTier(caps),
+): WasmLLMModel | undefined {
+  const tier = TIER_ORDER[
+    Math.min(TIER_ORDER.indexOf(detectDeviceTier(caps)), TIER_ORDER.indexOf(preferredTier))
+  ];
+  return [...WASM_LLM_MODELS]
+    .reverse()
+    .find(
+      (model) =>
+        TIER_ORDER.indexOf(model.tier) <= TIER_ORDER.indexOf(tier) &&
+        canRunWasmModel(model, caps),
+    );
+}
+
+export function getWasmModel(modelId: string): WasmLLMModel | undefined {
+  return WASM_LLM_MODELS.find((model) => model.modelId === modelId);
 }
 
 export function getModel(modelId: string): LLMModel | undefined {

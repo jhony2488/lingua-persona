@@ -16,6 +16,7 @@ import {
   detectDeviceCapabilities,
   detectDeviceTier,
   getModel,
+  getWasmModel,
   pickDefaultModel,
 } from "@/lib/llm/models";
 import { useLLMStore } from "@/lib/llm/store";
@@ -64,7 +65,9 @@ export function EngineStatus() {
   );
 
   const activeModel =
-    (activeModelId ? getModel(activeModelId) : undefined) ??
+    (activeModelId
+      ? (getModel(activeModelId) ?? getWasmModel(activeModelId))
+      : undefined) ??
     (llmModel ? getModel(llmModel) : undefined) ??
     recommended;
 

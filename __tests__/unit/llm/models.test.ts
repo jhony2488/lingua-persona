@@ -1,7 +1,10 @@
 import {
+  canRunWasmModel,
   LLM_MODELS,
+  pickWasmModel,
   detectDeviceTier,
   pickDefaultModel,
+  WASM_LLM_MODELS,
   type DeviceCapabilities,
 } from "@/lib/llm/models";
 
@@ -64,5 +67,53 @@ describe("pickDefaultModel", () => {
       "medium",
       "large",
     ]);
+  });
+});
+
+describe("pickWasmModel", () => {
+  it("selects a smaller model for constrained devices", () => {
+    expect(
+      pickWasmModel(caps({ deviceMemoryGB: 4, hardwareConcurrency: 4 }))
+        ?.modelId,
+    ).toBe("onnx-community/Qwen2.5-0.5B-Instruct");
+  });
+
+  it("selects the larger WASM model only when memory and CPU allow it", () => {
+    expect(
+      pickWasmModel(caps({ deviceMemoryGB: 16, hardwareConcurrency: 8 }))
+        ?.modelId,
+    ).toBe("onnx-community/Qwen2.5-1.5B-Instruct");
+    expect(
+      pickWasmModel(caps({ deviceMemoryGB: 8, hardwareConcurrency: 4 }))
+        ?.modelId,
+    ).toBe("onnx-community/Qwen2.5-0.5B-Instruct");
+  });
+
+  it("rejects models when reported device limits are too low", () => {
+    expect(
+      canRunWasmModel(
+        WASM_LLM_MODELS[0],
+        caps({ deviceMemoryGB: 2, hardwareConcurrency: 2 }),
+      ),
+    ).toBe(false);
+    expect(pickWasmModel(caps({ deviceMemoryGB: 2, hardwareConcurrency: 2 })))
+      .toBeUndefined();
+  });
+
+  it("does not guess when both hardware signals are unavailable", () => {
+    expect(pickWasmModel(caps({}))).toBeUndefined();
+  });
+
+  it("keeps the larger model gated when either hardware signal is missing", () => {
+    expect(
+      canRunWasmModel(
+        WASM_LLM_MODELS[1],
+        caps({ deviceMemoryGB: 16, hardwareConcurrency: null }),
+      ),
+    ).toBe(false);
+    expect(
+      pickWasmModel(caps({ deviceMemoryGB: 16, hardwareConcurrency: null }))
+        ?.modelId,
+    ).toBe("onnx-community/Qwen2.5-0.5B-Instruct");
   });
 });

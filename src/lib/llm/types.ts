@@ -5,7 +5,7 @@ import type {
   LLMEnginePreference,
 } from "@/lib/store/settings";
 
-export type EngineKind = "webllm" | "ollama" | "local";
+export type EngineKind = "webllm" | "wasm" | "ollama" | "local";
 
 export type { LLMEnginePreference };
 

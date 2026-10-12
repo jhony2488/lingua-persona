@@ -1,6 +1,10 @@
 import { generateChatReply } from "@/lib/llm/router";
 import { generateWebLLM, hasWebGPU } from "@/lib/llm/webllm.engine";
 import {
+  generateWasmLLM,
+  isWasmSupported,
+} from "@/lib/llm/wasm.engine";
+import {
   ollamaChat,
   pickOllamaModel,
   probeOllama,
@@ -15,6 +19,12 @@ jest.mock("@/lib/llm/webllm.engine", () => ({
   resetWebLLM: jest.fn(),
 }));
 
+jest.mock("@/lib/llm/wasm.engine", () => ({
+  generateWasmLLM: jest.fn(),
+  isWasmSupported: jest.fn(),
+  resetWasmLLM: jest.fn(),
+}));
+
 jest.mock("@/lib/llm/ollama.engine", () => ({
   probeOllama: jest.fn(),
   pickOllamaModel: jest.fn(),
@@ -23,6 +33,8 @@ jest.mock("@/lib/llm/ollama.engine", () => ({
 
 const mockHasWebGPU = jest.mocked(hasWebGPU);
 const mockWebLLM = jest.mocked(generateWebLLM);
+const mockWasmLLM = jest.mocked(generateWasmLLM);
+const mockIsWasmSupported = jest.mocked(isWasmSupported);
 const mockProbe = jest.mocked(probeOllama);
 const mockOllama = jest.mocked(ollamaChat);
 const mockPickOllama = jest.mocked(pickOllamaModel);
@@ -44,6 +56,7 @@ describe("generateChatReply — engine chain", () => {
   beforeEach(() => {
     useSettings.setState({ llmEngine: "auto", llmModel: null });
     mockHasWebGPU.mockResolvedValue(false);
+    mockIsWasmSupported.mockReturnValue(false);
     mockProbe.mockResolvedValue([]);
     mockPickOllama.mockReturnValue(null);
   });
@@ -71,6 +84,23 @@ describe("generateChatReply — engine chain", () => {
 
     expect(result).toEqual({ reply: "Ollama says hi", engine: "ollama" });
     expect(mockOllama).toHaveBeenCalledWith(expect.anything(), "llama3.2:3b");
+  });
+
+  it("uses a smaller WASM model before probing Ollama when WebGPU is unavailable", async () => {
+    mockIsWasmSupported.mockReturnValue(true);
+    mockWasmLLM.mockResolvedValue("WASM says hi");
+
+    const result = await generateChatReply(history, ctx);
+
+    expect(result).toEqual({ reply: "WASM says hi", engine: "wasm" });
+    expect(mockWasmLLM).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        modelId: "onnx-community/Qwen2.5-0.5B-Instruct",
+      }),
+      expect.any(Function),
+    );
+    expect(mockProbe).not.toHaveBeenCalled();
   });
 
   it("falls back to Ollama when WebLLM fails", async () => {
