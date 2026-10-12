@@ -183,11 +183,12 @@ export const dictionary: Dictionary = {
   onboarding: {
     title: "Bem-vindo ao LinguaPersona",
     description:
-      "Diga seu nome e e-mail para começar a praticar. Seus dados ficam neste dispositivo.",
+      "Informe seu e-mail para acessar seu perfil. Se for sua primeira vez, pediremos seu nome.",
     namePlaceholder: "Seu nome",
     emailPlaceholder: "voce@exemplo.com",
     error: "Não foi possível criar seu perfil. Tente novamente.",
     saving: "Salvando…",
+    continue: "Continuar",
     start: "Começar",
   },
   installBanner: {

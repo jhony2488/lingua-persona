@@ -11,6 +11,6 @@ export const GET = withErrorHandler(async () => {
 
 export const POST = withErrorHandler(async (req) => {
   const input = await parseBody(req, createUserSchema);
-  const user = await userService.create(input);
-  return json(user, 201);
+  const result = await userService.createOrGet(input);
+  return json(result.user, result.created ? 201 : 200);
 });

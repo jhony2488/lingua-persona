@@ -180,11 +180,12 @@ export const dictionary = {
   onboarding: {
     title: "Welcome to LinguaPersona",
     description:
-      "Tell us your name and email to start practicing. Your data stays on this device.",
+      "Enter your email to access your profile. If you are new, we will ask for your name.",
     namePlaceholder: "Your name",
     emailPlaceholder: "you@example.com",
     error: "Could not create your profile. Try again.",
     saving: "Saving…",
+    continue: "Continue",
     start: "Start",
   },
   installBanner: {

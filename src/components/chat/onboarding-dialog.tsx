@@ -18,20 +18,35 @@ import { useSettings } from "@/lib/store/settings";
 export function OnboardingDialog({ open }: { open: boolean }) {
   const dict = useDict();
   const setUserId = useSettings((state) => state.setUserId);
+  const setDialect = useSettings((state) => state.setDialect);
+  const setLevel = useSettings((state) => state.setLevel);
   const dialect = useSettings((state) => state.dialect);
   const level = useSettings((state) => state.level);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [needsName, setNeedsName] = useState(false);
 
   const mutation = useMutation({
-    mutationFn: () =>
-      api.createUser({
+    mutationFn: async () => {
+      if (!needsName) {
+        const existingUser = await api.findUserByEmail(email);
+        if (existingUser) return existingUser;
+        setNeedsName(true);
+        return null;
+      }
+      return api.createUser({
         name,
         email,
         englishLevel: level,
         preferredDialect: dialect,
-      }),
-    onSuccess: (user) => setUserId(user.id),
+      });
+    },
+    onSuccess: (user) => {
+      if (!user) return;
+      setUserId(user.id);
+      setDialect(user.preferredDialect as "US" | "UK");
+      setLevel(user.englishLevel as "A1" | "A2" | "B1" | "B2" | "C1" | "C2");
+    },
   });
 
   return (
@@ -49,25 +64,30 @@ export function OnboardingDialog({ open }: { open: boolean }) {
           }}
         >
           <Input
-            placeholder={dict.onboarding.namePlaceholder}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-          />
-          <Input
             type="email"
             placeholder={dict.onboarding.emailPlaceholder}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
           />
+          {needsName && (
+            <Input
+              placeholder={dict.onboarding.namePlaceholder}
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              required
+              autoFocus
+            />
+          )}
           {mutation.isError && (
             <p className="text-destructive text-sm">{dict.onboarding.error}</p>
           )}
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending
               ? dict.onboarding.saving
-              : dict.onboarding.start}
+              : needsName
+                ? dict.onboarding.start
+                : dict.onboarding.continue}
           </Button>
         </form>
       </DialogContent>

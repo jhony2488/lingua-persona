@@ -78,6 +78,14 @@ export interface GeneratePlanPayload {
 }
 
 export const api = {
+  findUserByEmail: (email: string): Promise<User | null> =>
+    isNative()
+      ? local().then((l) => l.findUserByEmail(email))
+      : apiFetch<User | null>("/api/users/lookup", {
+          method: "POST",
+          body: JSON.stringify({ email }),
+        }),
+
   createUser: (payload: CreateUserPayload): Promise<User> =>
     isNative()
       ? local().then((l) => l.createUser(payload))

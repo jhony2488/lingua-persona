@@ -45,8 +45,23 @@ async function db(): Promise<SQLiteDBConnection> {
 const now = () => new Date().toISOString();
 
 export const localApi = {
+  async findUserByEmail(email: string): Promise<User | null> {
+    const connection = await db();
+    const result = await connection.query(
+      `SELECT * FROM "User" WHERE email = ?`,
+      [email],
+    );
+    return (result.values?.[0] as User | undefined) ?? null;
+  },
+
   async createUser(payload: CreateUserPayload): Promise<User> {
     const connection = await db();
+    const existing = await connection.query(
+      `SELECT * FROM "User" WHERE email = ?`,
+      [payload.email],
+    );
+    if (existing.values?.[0]) return existing.values[0] as unknown as User;
+
     const user = {
       id: crypto.randomUUID(),
       email: payload.email,
@@ -71,6 +86,13 @@ export const localApi = {
         ],
       );
     } catch {
+      const racedUser = await connection.query(
+        `SELECT * FROM "User" WHERE email = ?`,
+        [payload.email],
+      );
+      if (racedUser.values?.[0]) {
+        return racedUser.values[0] as unknown as User;
+      }
       throw new ApiError("Email already in use", 409, "CONFLICT");
     }
     return user as unknown as User;

@@ -5,6 +5,7 @@ export const dialectSchema = z.enum(["US", "UK"]);
 export const idSchema = z.string().min(1);
 
 export const userParamsSchema = z.object({ id: idSchema });
+export const lookupUserSchema = z.object({ email: z.email() });
 
 export const createUserSchema = z.object({
   email: z.email(),
