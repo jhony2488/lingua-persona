@@ -33,15 +33,27 @@ The model is chosen automatically from device capability (`detectDeviceCapabilit
 
 Each tier carries its own budget: `maxHistory` (4–12 messages), `maxTokens` (256–512), and `temperature` — see `LLM_MODELS`.
 
+## WASM as a CPU fallback
+
+When WebGPU is unavailable or WebLLM fails, the app tries Transformers.js with ONNX Runtime in **WebAssembly**, inside a Web Worker. This path uses its own ONNX models, not WebLLM's MLC artifacts.
+
+| Profile      | ONNX model                                       | Approximate size | Minimum requirements                                 |
+| ------------ | ------------------------------------------------ | ---------------- | ---------------------------------------------------- |
+| tiny/small   | `onnx-community/Qwen2.5-0.5B-Instruct` (`q4f16`) | ~483 MB          | 4 GB memory or more; 4 threads or more when reported |
+| medium/large | `onnx-community/Qwen2.5-1.5B-Instruct` (`q4f16`) | ~1.4 GB          | 8 GB memory and 6 threads or more                    |
+
+Selection reuses the device tier and the tier requested in the existing model selector, but never chooses a model above detected capacity. If only the smaller model fits, it is used; if available signals are insufficient or the device falls below the minimum, the router skips WASM and tries Ollama/local fallback. CPU inference is expected to be slower than WebGPU.
+
 ## Fallback chain
 
 The router (`src/lib/llm/router.ts`) tries in order and never fails:
 
 1. **WebLLM** — when `navigator.gpu.requestAdapter()` returns an adapter.
-2. **Ollama** — non-native shells only; probes `GET /api/tags` at `http://localhost:11434` (2s) and picks among the **installed models** by preference for the detected tier.
-3. **Local** — `generateAssistantReply`, a deterministic "offline mode" reply that keeps the chat functional.
+2. **WASM** — Transformers.js/ONNX Runtime, with model size selected from memory and CPU capability.
+3. **Ollama** — non-native shells only; probes `GET /api/tags` at `http://localhost:11434` (2s) and picks among the **installed models** by preference for the detected tier.
+4. **Local** — `generateAssistantReply`, a deterministic "offline mode" reply that keeps the chat functional.
 
-The user's preference (`settings.llmEngine`: `auto | webllm | ollama | local`) can force a path; `auto` walks the whole chain.
+The user's preference (`settings.llmEngine`: `auto | webllm | wasm | ollama | local`) selects the preferred path; `auto` tries WebLLM and WASM before Ollama. WebLLM and WASM can also be selected individually in the chat header.
 
 ## Where generation happens
 
@@ -57,12 +69,13 @@ The user's preference (`settings.llmEngine`: `auto | webllm | ollama | local`) c
 
 ## WebLLM vs Ollama
 
-| Aspect        | WebLLM                 | Ollama                 |
-| ------------- | ---------------------- | ---------------------- |
-| Location      | In the browser         | Local server           |
-| Hardware      | WebGPU                 | Local CPU/GPU          |
-| System prompt | `messages[0]` (system) | `messages[0]` (system) |
-| Cache         | Engine KV cache        | llama.cpp KV cache     |
+| Aspect        | WebLLM                 | WASM/Transformers.js | Ollama                 |
+| ------------- | ---------------------- | -------------------- | ---------------------- |
+| Location      | In the browser         | In the browser       | Local server           |
+| Hardware      | WebGPU                 | CPU via WebAssembly  | Local CPU/GPU          |
+| Format        | MLC                    | Quantized ONNX       | GGUF                   |
+| System prompt | `messages[0]` (system) | Model chat template  | `messages[0]` (system) |
+| Cache         | Engine KV cache        | Browser Cache API    | llama.cpp KV cache     |
 
 ## See also
 

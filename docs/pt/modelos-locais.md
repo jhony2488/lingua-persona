@@ -4,7 +4,18 @@ O WebLLM resolve os pesos do modelo em runtime, nesta ordem:
 
 1. **`public/models/`** — se `public/models/manifest.json` existir e contiver o `modelId`, os arquivos são servidos localmente (`/models/<id>/resolve/main/...`), permitindo uso 100% offline desde o primeiro acesso.
 2. **Hugging Face** — sem manifest local, o `prebuiltAppConfig` baixa do HF na primeira execução e o WebLLM guarda no **Cache API / IndexedDB** do navegador/webview para uso offline nas vezes seguintes.
-3. **Fallback** — se o download falhar, a cadeia de engines assume (Ollama → local), ver [Motor de inferência](motor-de-inferencia.md).
+3. **Fallback** — se WebGPU ou o download WebLLM falhar, a cadeia tenta WASM → Ollama → resposta local, ver [Motor de inferência](motor-de-inferencia.md).
+
+## Modelos ONNX para WASM
+
+O fallback em CPU usa Transformers.js e ONNX Runtime WebAssembly, com modelos próprios hospedados no Hugging Face. Eles não são incluídos no catálogo MLC nem no script `npm run download-models`.
+
+| Perfil       | Modelo                                 | Arquivo quantizado    |
+| ------------ | -------------------------------------- | --------------------- |
+| tiny/small   | `onnx-community/Qwen2.5-0.5B-Instruct` | ONNX `q4f16`, ~483 MB |
+| medium/large | `onnx-community/Qwen2.5-1.5B-Instruct` | ONNX `q4f16`, ~1,4 GB |
+
+Transformers.js baixa o modelo sob demanda e usa o cache do navegador para reutilizá-lo. O primeiro uso precisa de conexão; depois, a inferência pode funcionar offline enquanto os pesos permanecerem no cache. O tamanho escolhido respeita o tier, a memória e os núcleos reportados pelo dispositivo. Confira os limites em [Guia de hardware](guia-de-hardware.md).
 
 ## Script de download (self-hosting opcional)
 
@@ -36,6 +47,8 @@ Ao final, o script escreve `public/models/manifest.json` no formato
 > instalador (270 MB–2 GB por modelo). O default recomendado é o download
 > sob demanda do Hugging Face — use o script só se precisar de offline
 > total no primeiro uso.
+
+Esse script só baixa modelos WebLLM/MLC. Ele não self-hospeda os modelos ONNX usados pelo fallback WASM.
 
 ## Armazenamento no navegador
 

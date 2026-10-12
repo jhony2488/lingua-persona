@@ -22,7 +22,7 @@ SQLite. No external server required for native builds.
   `asChild`
 - Prisma + SQLite · Zod · TanStack Query · Zustand
 - `@mlc-ai/web-llm` — inferência no cliente via WebGPU (worker); fallback
-  Ollama → resposta local (`src/lib/llm/`)
+  Transformers.js/ONNX via WASM → Ollama → resposta local (`src/lib/llm/`)
 - Serwist (PWA service worker via `/serwist/[path]`)
 - Jest + React Testing Library + Supertest + MSW
 - Capacitor (Android/iOS) · Tauri (desktop) · `@capacitor-community/sqlite`
@@ -61,8 +61,8 @@ src/modules/<domain>/     schema.ts (zod) · service.ts · repository.ts
 src/modules/study/        + plan-generator.ts, topics.data.ts (shared, pure)
 src/i18n/                 config, detect, get-dictionary, provider, dictionaries/
 src/lib/local-db/         mobile sqlite layer (schema.sql.ts + local-api.ts)
-src/lib/llm/              client-side inference: router + engines (webllm worker,
-                          ollama, local) + device-tier model selection
+src/lib/llm/              client-side inference: router + engines (webllm/WASM
+                          workers, ollama, local) + device-tier model selection
 src/lib/stt/              whisper fallback (worker + SpeechRecognitionLike
                           adapter) when Web Speech API is missing
 src/modules/assistant/    prompt.ts (persona + CEFR level + model tier) +
@@ -120,23 +120,23 @@ the sidecar on localhost. Shared pure logic (`plan-generator`, Zod schemas,
 
 ## Documentation map
 
-| Topic                            | Português                                                        | English                                                    |
-| -------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------- |
-| Architecture                     | [arquitetura.md](docs/pt/arquitetura.md)                         | [architecture.md](docs/en/architecture.md)                 |
-| Inference engine (WebLLM/Ollama) | [motor-de-inferencia.md](docs/pt/motor-de-inferencia.md)         | [inference-engine.md](docs/en/inference-engine.md)         |
-| Local models                     | [modelos-locais.md](docs/pt/modelos-locais.md)                   | [local-models.md](docs/en/local-models.md)                 |
-| Hardware & model guide           | [guia-de-hardware.md](docs/pt/guia-de-hardware.md)               | [hardware-guide.md](docs/en/hardware-guide.md)             |
-| Virtual teacher                  | [professor-virtual.md](docs/pt/professor-virtual.md)             | [virtual-teacher.md](docs/en/virtual-teacher.md)           |
-| Pedagogy & prompts               | [pedagogia-e-prompts.md](docs/pt/pedagogia-e-prompts.md)         | [pedagogy-and-prompts.md](docs/en/pedagogy-and-prompts.md) |
-| RAG & memory                     | [rag-e-memoria.md](docs/pt/rag-e-memoria.md)                     | [rag-and-memory.md](docs/en/rag-and-memory.md)             |
-| Local vector search              | [pesquisa-vetorial-local.md](docs/pt/pesquisa-vetorial-local.md) | [local-vector-search.md](docs/en/local-vector-search.md)   |
-| Voice & audio                    | [voz-e-audio.md](docs/pt/voz-e-audio.md)                         | [voice-and-audio.md](docs/en/voice-and-audio.md)           |
-| Agent gender                     | [genero-do-agente.md](docs/pt/genero-do-agente.md)               | [agent-gender.md](docs/en/agent-gender.md)                 |
-| PWA & distribution               | [pwa-e-distribuicao.md](docs/pt/pwa-e-distribuicao.md)           | [pwa-and-distribution.md](docs/en/pwa-and-distribution.md) |
-| `.npmrc` security                | [npmrc.md](docs/pt/npmrc.md)                                     | [npmrc.md](docs/en/npmrc.md)                               |
-| SSH commit signing               | [assinatura-ssh.md](docs/pt/assinatura-ssh.md)                   | [ssh-signing.md](docs/en/ssh-signing.md)                   |
-| Testing (jest + e2e)             | [testes.md](docs/pt/testes.md)                                   | [testing.md](docs/en/testing.md)                           |
-| Ignore directives                | [diretivas-de-ignore.md](docs/pt/diretivas-de-ignore.md)         | [ignore-directives.md](docs/en/ignore-directives.md)       |
+| Topic                                 | Português                                                        | English                                                    |
+| ------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------- |
+| Architecture                          | [arquitetura.md](docs/pt/arquitetura.md)                         | [architecture.md](docs/en/architecture.md)                 |
+| Inference engine (WebLLM/WASM/Ollama) | [motor-de-inferencia.md](docs/pt/motor-de-inferencia.md)         | [inference-engine.md](docs/en/inference-engine.md)         |
+| Local models                          | [modelos-locais.md](docs/pt/modelos-locais.md)                   | [local-models.md](docs/en/local-models.md)                 |
+| Hardware & model guide                | [guia-de-hardware.md](docs/pt/guia-de-hardware.md)               | [hardware-guide.md](docs/en/hardware-guide.md)             |
+| Virtual teacher                       | [professor-virtual.md](docs/pt/professor-virtual.md)             | [virtual-teacher.md](docs/en/virtual-teacher.md)           |
+| Pedagogy & prompts                    | [pedagogia-e-prompts.md](docs/pt/pedagogia-e-prompts.md)         | [pedagogy-and-prompts.md](docs/en/pedagogy-and-prompts.md) |
+| RAG & memory                          | [rag-e-memoria.md](docs/pt/rag-e-memoria.md)                     | [rag-and-memory.md](docs/en/rag-and-memory.md)             |
+| Local vector search                   | [pesquisa-vetorial-local.md](docs/pt/pesquisa-vetorial-local.md) | [local-vector-search.md](docs/en/local-vector-search.md)   |
+| Voice & audio                         | [voz-e-audio.md](docs/pt/voz-e-audio.md)                         | [voice-and-audio.md](docs/en/voice-and-audio.md)           |
+| Agent gender                          | [genero-do-agente.md](docs/pt/genero-do-agente.md)               | [agent-gender.md](docs/en/agent-gender.md)                 |
+| PWA & distribution                    | [pwa-e-distribuicao.md](docs/pt/pwa-e-distribuicao.md)           | [pwa-and-distribution.md](docs/en/pwa-and-distribution.md) |
+| `.npmrc` security                     | [npmrc.md](docs/pt/npmrc.md)                                     | [npmrc.md](docs/en/npmrc.md)                               |
+| SSH commit signing                    | [assinatura-ssh.md](docs/pt/assinatura-ssh.md)                   | [ssh-signing.md](docs/en/ssh-signing.md)                   |
+| Testing (jest + e2e)                  | [testes.md](docs/pt/testes.md)                                   | [testing.md](docs/en/testing.md)                           |
+| Ignore directives                     | [diretivas-de-ignore.md](docs/pt/diretivas-de-ignore.md)         | [ignore-directives.md](docs/en/ignore-directives.md)       |
 
 See also: `README.md` / `README.en.md`, `CONTRIBUTING.md` /
 `CONTRIBUTING.en.md`.

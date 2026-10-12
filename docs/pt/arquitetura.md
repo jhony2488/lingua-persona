@@ -9,8 +9,9 @@ O LinguaPersona é dividido em três camadas principais: execução do modelo de
 Responsável por receber o texto/voz do usuário, gerar a resposta do professor e gerenciar modelos de linguagem.
 
 - **WebLLM/WebGPU** é a engine principal. Os pesos são carregados no navegador e a inferência roda localmente na GPU do usuário.
-- **Fallback** é acionado quando WebGPU não está disponível, quando o modelo é pesado demais ou quando o usuário escolhe um backend alternativo. As opções são **Ollama** (servidor local) ou APIs externas (**OpenAI**, **Groq** etc.).
-- A escolha do modelo leva em conta a capacidade do dispositivo: memória de vídeo, suporte a WebGPU e largura de banda.
+- **Transformers.js/ONNX Runtime WebAssembly** é o fallback local em CPU quando WebGPU não está disponível ou o WebLLM falha. Ele escolhe um modelo ONNX menor com base na memória e nos núcleos reportados pelo navegador.
+- Se WASM não for suportado pelo dispositivo ou falhar, o app tenta **Ollama** (servidor local); por último, usa uma resposta pedagógica determinística local. Os engines WebLLM, WASM e Ollama também podem ser selecionados no chat.
+- A seleção considera capacidade de memória, número de núcleos, heurística de dispositivo móvel e suporte a WebGPU. Os pesos são baixados sob demanda e armazenados localmente pelo navegador.
 
 ### 2. Dados e RAG
 

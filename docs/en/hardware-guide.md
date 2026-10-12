@@ -1,6 +1,6 @@
 # Hardware and model guide
 
-You do not need a powerful computer to run LinguaPersona. This guide helps you pick the right model for your hardware, whether running in the browser (WebLLM), on Ollama, or on another local API.
+You do not need a powerful computer to run LinguaPersona. This guide helps you pick the right model for your hardware, whether running in the browser (WebLLM/WebGPU or Transformers.js/WASM), on Ollama, or on another local API.
 
 ## Why small models work well here
 
@@ -8,12 +8,12 @@ Models with 1B–3B parameters may look "weak" on paper, but in this app they de
 
 - **RAG**: the student's past errors, learned vocabulary, and grammar rules are retrieved and injected into the prompt. The model does not need to "know everything" — the right context arrives ready in the window.
 - **Narrow task**: the model only needs to be an English teacher. Structured system prompts (feedback sandwich, adaptive level, US/UK) constrain the response space, where small models perform well.
-- **Quantization**: 4-bit formats (`q4f16` in WebLLM, `Q4_K_M` in GGUF) reduce memory usage ~4x with minimal quality loss.
+- **Quantization**: 4-bit formats (`q4f16` in WebLLM and ONNX, `Q4_K_M` in GGUF) reduce memory usage ~4x with minimal quality loss.
 - **KV cache / prompt caching**: the system prompt is reused across turns, so per-message latency drops significantly even on CPU.
 
 ## Models for Ollama
 
-With [Ollama](https://ollama.com) installed, pull a model with `ollama pull <tag>` and the app uses it via `http://localhost:11434` when WebGPU is unavailable or when you prefer it.
+With [Ollama](https://ollama.com) installed, pull a model with `ollama pull <tag>` and the app uses it via `http://localhost:11434` when browser engines are unavailable or when you prefer it.
 
 | Model          | Download | Min RAM | Recommended RAM | Notes                                |
 | -------------- | -------- | ------- | --------------- | ------------------------------------ |
@@ -99,11 +99,22 @@ MLC models run on the browser's GPU via WebGPU, with no installation. The app au
 
 Details in [Inference engine](inference-engine.md) and [Local models](local-models.md).
 
+## WASM (browser CPU)
+
+Without WebGPU, the app can run quantized ONNX models through Transformers.js and ONNX Runtime WebAssembly in a Web Worker. These are separate from WebLLM's MLC models. On first use, weights are downloaded from Hugging Face; afterward they remain in the browser cache.
+
+| ONNX model                                       | Approximate download | Reported requirements                                                                               | Selected profile |
+| ------------------------------------------------ | -------------------- | --------------------------------------------------------------------------------------------------- | ---------------- |
+| `onnx-community/Qwen2.5-0.5B-Instruct` (`q4f16`) | ~483 MB              | At least one signal must be available; reported memory must be >= 4 GB and reported processors >= 4 | tiny/small       |
+| `onnx-community/Qwen2.5-1.5B-Instruct` (`q4f16`) | ~1.4 GB              | At least 8 GB memory and 6 threads                                                                  | medium/large     |
+
+The chat model selector still sets the desired tier: tiny/small maps to the 0.5B ONNX model, while medium/large can use 1.5B if the device passes the limits. Detection may downgrade the tier on mobile devices or devices with few logical processors. WASM runs on the CPU and is expected to be slower than WebGPU; if limits are not met, the app skips this engine and tries Ollama or the local reply.
+
 ## Quick decision guide
 
-- **Weak PC, 4 GB RAM, no GPU**: Ollama with `llama3.2:1b` or `smollm2:360m`. In the browser, `SmolLM2-360M` if WebGPU works.
-- **Common notebook, 8 GB RAM**: Ollama with `llama3.2:3b` or `qwen2.5:1.5b`; WebLLM with `Llama-3.2-1B`.
-- **Good PC, 16 GB RAM or GPU with 8 GB VRAM**: Ollama with `qwen2.5:7b`/`llama3.1:8b`; WebLLM with `Llama-3.2-3B`.
+- **Weak PC, 4 GB RAM, no GPU**: WASM with `Qwen2.5-0.5B` if the browser reports enough capacity; Ollama with `llama3.2:1b` or `smollm2:360m` is another option.
+- **Common notebook, 8 GB RAM**: WASM with `Qwen2.5-1.5B` if 6 or more threads are reported; WebLLM with `Llama-3.2-1B` or Ollama with `qwen2.5:1.5b`.
+- **Good PC, 16 GB RAM or GPU with 8 GB VRAM**: Ollama with `qwen2.5:7b`/`llama3.1:8b`; WebLLM with `Llama-3.2-3B`; WASM can use up to `Qwen2.5-1.5B`.
 - **Strong hardware, 32 GB+ or GPU with 12 GB+ VRAM**: `qwen2.5:14b` for maximum quality.
 
 ## See also
