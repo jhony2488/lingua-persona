@@ -150,14 +150,12 @@ describe("PATCH /api/users/:id", () => {
   it("updates the user", async () => {
     const created = (await request(app).post("/api/users").send(validUser))
       .body;
-    const res = await request(app)
-      .patch(`/api/users/${created.id}`)
-      .send({
-        agentName: "Maya",
-        agentGender: "female",
-        englishLevel: "B1",
-        preferredDialect: "UK",
-      });
+    const res = await request(app).patch(`/api/users/${created.id}`).send({
+      agentName: "Maya",
+      agentGender: "female",
+      englishLevel: "B1",
+      preferredDialect: "UK",
+    });
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({

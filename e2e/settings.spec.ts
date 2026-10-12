@@ -30,12 +30,18 @@ test.describe("Settings", () => {
     await seedProfile(page, userId);
   });
 
-  test("persists teacher name and gender to the profile", async ({ page, request, userId }) => {
+  test("persists teacher name and gender to the profile", async ({
+    page,
+    request,
+    userId,
+  }) => {
     await goto(page, urls.settings);
 
     await page.getByLabel("Teacher name").fill("Maya");
     await page.getByLabel("Teacher name").press("Tab");
+    await expect(page.getByRole("status")).toContainText("Saved to profile");
     await selectOption(page, "Teacher voice", /Female/);
+    await expect(page.getByRole("status")).toContainText("Saved to profile");
 
     await page.reload();
     await expect(page.getByLabel("Teacher name")).toHaveValue("Maya");
@@ -55,11 +61,17 @@ test.describe("Settings", () => {
     });
   });
 
-  test("persists level and dialect to the profile", async ({ page, request, userId }) => {
+  test("persists level and dialect to the profile", async ({
+    page,
+    request,
+    userId,
+  }) => {
     await goto(page, urls.settings);
 
     await selectOption(page, "Dialect", "British English");
+    await expect(page.getByRole("status")).toContainText("Saved to profile");
     await selectOption(page, "Your level", "B2");
+    await expect(page.getByRole("status")).toContainText("Saved to profile");
 
     await page.reload();
     await expect(

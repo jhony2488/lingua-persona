@@ -90,7 +90,10 @@ export default function SettingsPage() {
             {dict.settings.teacherName}
             <Input
               value={agentName}
-              onChange={(event) => setAgentName(event.target.value)}
+              onChange={(event) => {
+                setAgentName(event.target.value);
+                saveMutation.reset();
+              }}
               onBlur={() => saveProfile({ agentName })}
               maxLength={40}
             />
@@ -165,18 +168,28 @@ export default function SettingsPage() {
             </Select>
           </label>
 
-          {userId && (saveMutation.isPending || saveMutation.isError) && (
-            <p
-              className={
-                saveMutation.isError
-                  ? "text-destructive text-sm"
-                  : "text-muted-foreground text-sm"
-              }
-              role="status"
-            >
-              {saveMutation.isPending
-                ? dict.settings.profileSaving
-                : dict.settings.profileSaveError}
+          {userId &&
+            (saveMutation.isPending ||
+              saveMutation.isError ||
+              saveMutation.isSuccess) && (
+              <p
+                className={
+                  saveMutation.isError
+                    ? "text-destructive text-sm"
+                    : "text-muted-foreground text-sm"
+                }
+                role="status"
+              >
+                {saveMutation.isPending
+                  ? dict.settings.profileSaving
+                  : saveMutation.isError
+                    ? dict.settings.profileSaveError
+                    : dict.settings.profileSaved}
+              </p>
+            )}
+          {!userId && (
+            <p className="text-muted-foreground text-sm" role="status">
+              {dict.settings.profileLocalOnly}
             </p>
           )}
 

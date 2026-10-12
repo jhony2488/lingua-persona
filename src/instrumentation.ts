@@ -6,10 +6,11 @@ export async function register() {
   // SQLite — o bootstrap do schema só faz sentido no standalone/Tauri.
   if (IS_LANDING || process.env.VERCEL === "1") return;
 
-  const [{ prisma }, { SCHEMA_STATEMENTS, USER_PROFILE_COLUMN_MIGRATIONS }] = await Promise.all([
-    import("@/lib/prisma"),
-    import("@/lib/local-db/schema.sql"),
-  ]);
+  const [{ prisma }, { SCHEMA_STATEMENTS, USER_PROFILE_COLUMN_MIGRATIONS }] =
+    await Promise.all([
+      import("@/lib/prisma"),
+      import("@/lib/local-db/schema.sql"),
+    ]);
 
   for (const statement of SCHEMA_STATEMENTS) {
     await prisma.$executeRawUnsafe(statement);
