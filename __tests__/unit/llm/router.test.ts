@@ -1,9 +1,6 @@
 import { generateChatReply } from "@/lib/llm/router";
 import { generateWebLLM, hasWebGPU } from "@/lib/llm/webllm.engine";
-import {
-  generateWasmLLM,
-  isWasmSupported,
-} from "@/lib/llm/wasm.engine";
+import { generateWasmLLM, isWasmSupported } from "@/lib/llm/wasm.engine";
 import {
   ollamaChat,
   pickOllamaModel,
@@ -100,6 +97,18 @@ describe("generateChatReply — engine chain", () => {
       }),
       expect.any(Function),
     );
+    expect(mockProbe).not.toHaveBeenCalled();
+  });
+
+  it("forces WASM without probing WebGPU or Ollama", async () => {
+    useSettings.setState({ llmEngine: "wasm" });
+    mockIsWasmSupported.mockReturnValue(true);
+    mockWasmLLM.mockResolvedValue("WASM says hi");
+
+    const result = await generateChatReply(history, ctx);
+
+    expect(result.engine).toBe("wasm");
+    expect(mockHasWebGPU).not.toHaveBeenCalled();
     expect(mockProbe).not.toHaveBeenCalled();
   });
 

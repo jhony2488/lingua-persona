@@ -1,7 +1,4 @@
-import {
-  generateWasmLLM,
-  resetWasmLLM,
-} from "@/lib/llm/wasm.engine";
+import { generateWasmLLM, resetWasmLLM } from "@/lib/llm/wasm.engine";
 import { WASM_LLM_MODELS } from "@/lib/llm/models";
 
 class FakeWorker {
@@ -46,10 +43,7 @@ describe("generateWasmLLM", () => {
     );
 
     expect(reply).toBe("A WASM reply");
-    expect(onProgress).toHaveBeenCalledWith(
-      0.5,
-      "onnx/model_q4f16.onnx",
-    );
+    expect(onProgress).toHaveBeenCalledWith(0.5, "onnx/model_q4f16.onnx");
     expect(fakeWorker.postMessage).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "generate",

@@ -96,8 +96,9 @@ describe("pickWasmModel", () => {
         caps({ deviceMemoryGB: 2, hardwareConcurrency: 2 }),
       ),
     ).toBe(false);
-    expect(pickWasmModel(caps({ deviceMemoryGB: 2, hardwareConcurrency: 2 })))
-      .toBeUndefined();
+    expect(
+      pickWasmModel(caps({ deviceMemoryGB: 2, hardwareConcurrency: 2 })),
+    ).toBeUndefined();
   });
 
   it("does not guess when both hardware signals are unavailable", () => {
