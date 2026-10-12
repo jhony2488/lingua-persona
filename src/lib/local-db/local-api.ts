@@ -301,11 +301,21 @@ export const localApi = {
       .map((row) => (row as { title: string | null }).title)
       .filter((t): t is string => Boolean(t));
 
+    const durationUnit = payload.durationUnit ?? "week";
+    const duration =
+      payload.duration ??
+      (durationUnit === "month"
+        ? Math.max(1, Math.round((payload.weeks ?? 4) / 4))
+        : (payload.weeks ?? 4));
+    const weeks = durationUnit === "month" ? duration * 4 : duration;
+
     const planJson = generatePlan({
       level: userRow.englishLevel as Parameters<
         typeof generatePlan
       >[0]["level"],
-      weeks: payload.weeks ?? 4,
+      weeks,
+      durationUnit,
+      duration,
       focus: payload.focus,
       usedTopics,
       books: manifestBooks,
@@ -315,7 +325,7 @@ export const localApi = {
       id: crypto.randomUUID(),
       userId: payload.userId,
       level: userRow.englishLevel,
-      weeks: payload.weeks ?? 4,
+      weeks,
       focus: payload.focus ?? "balanced",
       planJson: JSON.stringify(planJson),
       createdAt: now(),

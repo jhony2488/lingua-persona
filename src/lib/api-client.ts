@@ -83,6 +83,8 @@ export interface SendMessageContext {
 export interface GeneratePlanPayload {
   userId: string;
   weeks?: number;
+  durationUnit?: "week" | "month";
+  duration?: number;
   focus?: "grammar" | "speaking" | "balanced";
 }
 
