@@ -1,10 +1,14 @@
-import { generateWasmLLM, resetWasmLLM } from "@/lib/llm/wasm.engine";
+import {
+  generateWasmLLM,
+  preloadWasmLLM,
+  resetWasmLLM,
+} from "@/lib/llm/wasm.engine";
 import { WASM_LLM_MODELS } from "@/lib/llm/models";
 
 class FakeWorker {
   onmessage: ((event: MessageEvent) => void) | null = null;
   onerror: ((event: ErrorEvent) => void) | null = null;
-  postMessage = jest.fn((request: { id: number }) => {
+  postMessage = jest.fn((request: { id: number; type: string }) => {
     this.onmessage?.({
       data: {
         type: "progress",
@@ -14,7 +18,10 @@ class FakeWorker {
       },
     } as MessageEvent);
     this.onmessage?.({
-      data: { type: "result", id: request.id, text: "A WASM reply" },
+      data:
+        request.type === "init"
+          ? { type: "ready", id: request.id }
+          : { type: "result", id: request.id, text: "A WASM reply" },
     } as MessageEvent);
   });
   terminate = jest.fn();
@@ -47,6 +54,16 @@ describe("generateWasmLLM", () => {
     expect(fakeWorker.postMessage).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "generate",
+        model: WASM_LLM_MODELS[0],
+      }),
+    );
+  });
+
+  it("preloads the pipeline without generating a reply", async () => {
+    await expect(preloadWasmLLM(WASM_LLM_MODELS[0])).resolves.toBeUndefined();
+    expect(fakeWorker.postMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "init",
         model: WASM_LLM_MODELS[0],
       }),
     );

@@ -5,12 +5,14 @@ import type { LLMMessage } from "@/lib/llm/types";
 
 declare const self: DedicatedWorkerGlobalScope;
 
-interface WasmRequest {
-  type: "generate";
-  id: number;
-  messages: LLMMessage[];
-  model: WasmLLMModel;
-}
+type WasmRequest =
+  | { type: "init"; id: number; model: WasmLLMModel }
+  | {
+      type: "generate";
+      id: number;
+      messages: LLMMessage[];
+      model: WasmLLMModel;
+    };
 
 interface PipelineProgress {
   status?: string;
@@ -86,6 +88,10 @@ async function getGenerator(
 async function generate(request: WasmRequest): Promise<void> {
   try {
     const generator = await getGenerator(request.model, request.id);
+    if (request.type === "init") {
+      self.postMessage({ type: "ready", id: request.id });
+      return;
+    }
     self.postMessage({
       type: "progress",
       id: request.id,
