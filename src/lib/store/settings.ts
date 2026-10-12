@@ -8,8 +8,9 @@ export type EnglishLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
 export type AgentGender = "male" | "female";
 export type ChatMode = "chat" | "voice";
 export type VoiceFlow = "auto" | "confirm";
-/** Engine de inferência: auto (WebLLM→Ollama→local) ou forçado. */
-export type LLMEnginePreference = "auto" | "webllm" | "ollama" | "local";
+/** Engine de inferência: auto (WebLLM→WASM→Ollama→local) ou forçado. */
+export type LLMEnginePreference =
+  "auto" | "webllm" | "wasm" | "ollama" | "local";
 
 interface SettingsState {
   userId: string | null;

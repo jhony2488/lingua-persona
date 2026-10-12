@@ -27,6 +27,7 @@ const ENGINE_OPTIONS: { value: LLMEnginePreference; key: keyof EngineDict }[] =
   [
     { value: "auto", key: "engineAuto" },
     { value: "webllm", key: "engineWebllm" },
+    { value: "wasm", key: "engineWasm" },
     { value: "ollama", key: "engineOllama" },
     { value: "local", key: "engineLocal" },
   ];
@@ -34,6 +35,7 @@ const ENGINE_OPTIONS: { value: LLMEnginePreference; key: keyof EngineDict }[] =
 interface EngineDict {
   engineAuto: string;
   engineWebllm: string;
+  engineWasm: string;
   engineOllama: string;
   engineLocal: string;
 }

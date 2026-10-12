@@ -53,8 +53,8 @@ export async function generateChatReply(
   const preference = llmEngine ?? "auto";
   const preferredTier = getModel(llmModel ?? "")?.tier ?? tier;
 
-  if (preference !== "local" && preference !== "ollama") {
-    if (preference !== "wasm" && (await hasWebGPU())) {
+  if (preference === "auto" || preference === "webllm") {
+    if (await hasWebGPU()) {
       try {
         store.setStatus("downloading");
         const reply = await generateWebLLM(messages, model, (report) => {
@@ -68,16 +68,31 @@ export async function generateChatReply(
         // Falhou (download, adapter, worker) — segue a cadeia.
       }
     }
+  }
 
+  if (
+    preference === "auto" ||
+    preference === "webllm" ||
+    preference === "wasm"
+  ) {
     const wasmModel = pickWasmModel(capabilities, preferredTier);
     if (wasmModel && isWasmSupported()) {
       try {
+        const wasmMessages = toChatMessages(
+          history,
+          buildSystemPrompt(ctx, wasmModel.tier),
+          wasmModel.maxHistory,
+        );
         store.setModelId(wasmModel.modelId);
         store.setStatus("downloading");
-        const reply = await generateWasmLLM(messages, wasmModel, (progress, text) => {
-          store.setProgress(progress, text);
-          if (progress >= 1) store.setStatus("generating");
-        });
+        const reply = await generateWasmLLM(
+          wasmMessages,
+          wasmModel,
+          (progress, text) => {
+            store.setProgress(progress, text);
+            if (progress >= 1) store.setStatus("generating");
+          },
+        );
         store.setStatus("ready");
         store.setEngine("wasm");
         return { reply, engine: "wasm" };
@@ -87,11 +102,7 @@ export async function generateChatReply(
     }
   }
 
-  if (
-    preference !== "local" &&
-    preference !== "webllm" &&
-    preference !== "wasm"
-  ) {
+  if (preference === "auto" || preference === "ollama") {
     const installed = await probeOllama();
     const ollamaModel = pickOllamaModel(installed, tier);
     if (ollamaModel) {

@@ -189,9 +189,13 @@ export function pickWasmModel(
   caps: DeviceCapabilities,
   preferredTier: ModelTier = detectDeviceTier(caps),
 ): WasmLLMModel | undefined {
-  const tier = TIER_ORDER[
-    Math.min(TIER_ORDER.indexOf(detectDeviceTier(caps)), TIER_ORDER.indexOf(preferredTier))
-  ];
+  const tier =
+    TIER_ORDER[
+      Math.min(
+        TIER_ORDER.indexOf(detectDeviceTier(caps)),
+        TIER_ORDER.indexOf(preferredTier),
+      )
+    ];
   return [...WASM_LLM_MODELS]
     .reverse()
     .find(
