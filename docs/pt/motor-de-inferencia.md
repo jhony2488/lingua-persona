@@ -62,10 +62,10 @@ A preferência do usuário (`settings.llmEngine`: `auto | webllm | wasm | ollama
 ## Otimizações
 
 - **KV cache / prompt caching**: system prompt e instruções fixas são pré-processadas e reutilizadas entre turnos.
-- **Web Workers**: o WebLLM e a tokenização rodam fora da thread principal.
+- **Web Workers**: WebLLM, WASM, Whisper e tokenização rodam fora da thread principal.
 - **Quantização**: modelos em 4 bits (q4f16) são o padrão.
-- **Download sob demanda**: pesos vêm do Hugging Face na primeira vez e ficam no Cache API/IndexedDB; `npm run download-models` permite self-hosting.
-- **Preload em background**: o `ModelPreloader` (`src/components/model-preloader.tsx`, montado no layout localizado) dispara `initWebLLM` em tempo ocioso ao abrir qualquer página, então a primeira resposta não espera o download. Respeita a preferência de engine (`ollama`/`local` pulam), a disponibilidade de WebGPU e `navigator.connection.saveData`. Um init falho limpa o singleton do engine, permitindo retry na próxima mensagem.
+- **Download sob demanda**: os pesos vêm do Hugging Face na primeira vez e ficam no cache do navegador; `npm run download-models` permite self-hosting dos modelos MLC. O cache evita baixar de novo, mas não mantém o modelo carregado na memória após fechar o app.
+- **Preload em background**: o `ModelPreloader` (`src/components/model-preloader.tsx`, montado no layout localizado) aquece WebLLM quando WebGPU está disponível e WASM quando ele é selecionado. No modo automático sem WebGPU, o WASM é carregado na primeira mensagem, evitando iniciar um download grande sem ação do usuário. O preload começa em tempo ocioso e respeita o tier do dispositivo, `navigator.connection.saveData` e as preferências `ollama`/`local`. O worker mantém o pipeline em memória durante a sessão; se o app for fechado ou o sistema encerrar o worker, os pesos continuam em cache e o pipeline é recriado no próximo uso.
 
 ## Diferenças entre WebLLM e Ollama
 

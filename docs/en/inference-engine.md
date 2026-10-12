@@ -62,10 +62,10 @@ The user's preference (`settings.llmEngine`: `auto | webllm | wasm | ollama | lo
 ## Optimizations
 
 - **KV cache / prompt caching**: the system prompt and fixed instructions are preprocessed and reused across turns.
-- **Web Workers**: WebLLM and tokenization run off the main thread.
+- **Web Workers**: WebLLM, WASM, Whisper, and tokenization run off the main thread.
 - **Quantization**: 4-bit models (q4f16) are the default.
-- **On-demand download**: weights come from Hugging Face on first use and stay in the Cache API/IndexedDB; `npm run download-models` enables self-hosting.
-- **Background preload**: `ModelPreloader` (`src/components/model-preloader.tsx`, mounted in the localized layout) starts `initWebLLM` at idle time when any page opens, so the first reply doesn't wait for the download. It respects the engine preference (`ollama`/`local` skip it), WebGPU availability, and `navigator.connection.saveData`. A failed init clears the engine singleton so the next message can retry.
+- **On-demand download**: weights come from Hugging Face on first use and stay in the browser cache; `npm run download-models` enables self-hosting of MLC models. The cache avoids downloading again, but does not keep the model loaded in memory after the app closes.
+- **Background preload**: `ModelPreloader` (`src/components/model-preloader.tsx`, mounted in the localized layout) warms WebLLM when WebGPU is available and WASM when explicitly selected. In automatic mode without WebGPU, WASM loads on the first message to avoid starting a large download without user action. Preloading starts during idle time and respects the device tier, `navigator.connection.saveData`, and `ollama`/`local` preferences. The worker keeps the pipeline in memory for the session; if the app closes or the OS terminates the worker, cached weights remain and the pipeline is recreated on next use.
 
 ## WebLLM vs Ollama
 
