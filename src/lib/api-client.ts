@@ -44,9 +44,18 @@ const isNative = () => Capacitor.isNativePlatform();
 export interface CreateUserPayload {
   email: string;
   name: string;
+  agentName?: string;
+  agentGender?: "male" | "female";
   englishLevel?: string;
   preferredDialect?: string;
 }
+
+export type UpdateUserPayload = Partial<
+  Pick<
+    CreateUserPayload,
+    "agentName" | "agentGender" | "englishLevel" | "preferredDialect"
+  >
+>;
 
 export interface CreateConversationPayload {
   userId: string;
@@ -91,6 +100,14 @@ export const api = {
       ? local().then((l) => l.createUser(payload))
       : apiFetch<User>("/api/users", {
           method: "POST",
+          body: JSON.stringify(payload),
+        }),
+
+  updateUser: (id: string, payload: UpdateUserPayload): Promise<User> =>
+    isNative()
+      ? local().then((l) => l.updateUser(id, payload))
+      : apiFetch<User>(`/api/users/${encodeURIComponent(id)}`, {
+          method: "PATCH",
           body: JSON.stringify(payload),
         }),
 

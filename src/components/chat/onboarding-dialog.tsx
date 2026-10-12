@@ -20,8 +20,12 @@ export function OnboardingDialog({ open }: { open: boolean }) {
   const setUserId = useSettings((state) => state.setUserId);
   const setDialect = useSettings((state) => state.setDialect);
   const setLevel = useSettings((state) => state.setLevel);
+  const setAgentName = useSettings((state) => state.setAgentName);
+  const setAgentGender = useSettings((state) => state.setAgentGender);
   const dialect = useSettings((state) => state.dialect);
   const level = useSettings((state) => state.level);
+  const agentName = useSettings((state) => state.agentName);
+  const agentGender = useSettings((state) => state.agentGender);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [needsName, setNeedsName] = useState(false);
@@ -37,6 +41,8 @@ export function OnboardingDialog({ open }: { open: boolean }) {
       return api.createUser({
         name,
         email,
+        agentName,
+        agentGender,
         englishLevel: level,
         preferredDialect: dialect,
       });
@@ -44,6 +50,8 @@ export function OnboardingDialog({ open }: { open: boolean }) {
     onSuccess: (user) => {
       if (!user) return;
       setUserId(user.id);
+      setAgentName(user.agentName);
+      setAgentGender(user.agentGender as "male" | "female");
       setDialect(user.preferredDialect as "US" | "UK");
       setLevel(user.englishLevel as "A1" | "A2" | "B1" | "B2" | "C1" | "C2");
     },

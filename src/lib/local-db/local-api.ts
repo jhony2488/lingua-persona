@@ -8,8 +8,12 @@ import type {
   CreateConversationPayload,
   CreateUserPayload,
   GeneratePlanPayload,
+  UpdateUserPayload,
 } from "@/lib/api-client";
-import { SCHEMA_STATEMENTS } from "@/lib/local-db/schema.sql";
+import {
+  SCHEMA_STATEMENTS,
+  USER_PROFILE_COLUMN_MIGRATIONS,
+} from "@/lib/local-db/schema.sql";
 import {
   generatePlan,
   type ManifestBook,
@@ -36,6 +40,17 @@ async function db(): Promise<SQLiteDBConnection> {
     await connection.execute("PRAGMA foreign_keys = ON");
     for (const statement of SCHEMA_STATEMENTS) {
       await connection.execute(statement);
+    }
+    const userColumns = await connection.query(`PRAGMA table_info("User")`);
+    const existingColumns = new Set(
+      ((userColumns.values ?? []) as { name: string }[]).map(
+        (column) => column.name,
+      ),
+    );
+    for (const migration of USER_PROFILE_COLUMN_MIGRATIONS) {
+      if (!existingColumns.has(migration.name)) {
+        await connection.execute(migration.statement);
+      }
     }
     return connection;
   })();
@@ -66,6 +81,8 @@ export const localApi = {
       id: crypto.randomUUID(),
       email: payload.email,
       name: payload.name,
+      agentName: payload.agentName ?? "Alex",
+      agentGender: payload.agentGender ?? "male",
       englishLevel: payload.englishLevel ?? "A1",
       preferredDialect: payload.preferredDialect ?? "US",
       createdAt: now(),
@@ -73,12 +90,14 @@ export const localApi = {
     };
     try {
       await connection.run(
-        `INSERT INTO "User" (id, email, name, englishLevel, preferredDialect, createdAt, updatedAt)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO "User" (id, email, name, agentName, agentGender, englishLevel, preferredDialect, createdAt, updatedAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           user.id,
           user.email,
           user.name,
+          user.agentName,
+          user.agentGender,
           user.englishLevel,
           user.preferredDialect,
           user.createdAt,
@@ -96,6 +115,39 @@ export const localApi = {
       throw new ApiError("Email already in use", 409, "CONFLICT");
     }
     return user as unknown as User;
+  },
+
+  async updateUser(id: string, payload: UpdateUserPayload): Promise<User> {
+    const connection = await db();
+    const fields: string[] = [];
+    const values: string[] = [];
+    const columns = [
+      ["agentName", payload.agentName],
+      ["agentGender", payload.agentGender],
+      ["englishLevel", payload.englishLevel],
+      ["preferredDialect", payload.preferredDialect],
+    ] as const;
+
+    for (const [column, value] of columns) {
+      if (value === undefined) continue;
+      fields.push(`"${column}" = ?`);
+      values.push(value);
+    }
+    if (fields.length === 0) {
+      throw new ApiError("At least one field must be provided", 422);
+    }
+
+    fields.push('"updatedAt" = ?');
+    values.push(now(), id);
+    await connection.run(
+      `UPDATE "User" SET ${fields.join(", ")} WHERE id = ?`,
+      values,
+    );
+    const result = await connection.query(`SELECT * FROM "User" WHERE id = ?`, [
+      id,
+    ]);
+    if (!result.values?.[0]) throw new ApiError("User not found", 404);
+    return result.values[0] as unknown as User;
   },
 
   async listConversations(userId?: string): Promise<Conversation[]> {

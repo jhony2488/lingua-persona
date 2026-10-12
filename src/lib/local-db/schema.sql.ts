@@ -9,6 +9,8 @@ export const SCHEMA_STATEMENTS = [
     "id" TEXT NOT NULL PRIMARY KEY,
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "agentName" TEXT NOT NULL DEFAULT 'Alex',
+    "agentGender" TEXT NOT NULL DEFAULT 'male',
     "englishLevel" TEXT NOT NULL DEFAULT 'A1',
     "preferredDialect" TEXT NOT NULL DEFAULT 'US',
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -53,3 +55,14 @@ export const SCHEMA_STATEMENTS = [
   )`,
   `CREATE INDEX IF NOT EXISTS "StudyPlan_userId_createdAt_idx" ON "StudyPlan"("userId", "createdAt")`,
 ];
+
+export const USER_PROFILE_COLUMN_MIGRATIONS = [
+  {
+    name: "agentName",
+    statement: `ALTER TABLE "User" ADD COLUMN "agentName" TEXT NOT NULL DEFAULT 'Alex'`,
+  },
+  {
+    name: "agentGender",
+    statement: `ALTER TABLE "User" ADD COLUMN "agentGender" TEXT NOT NULL DEFAULT 'male'`,
+  },
+] as const;

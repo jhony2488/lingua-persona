@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { format } from "@/i18n/format";
 import { useDict } from "@/i18n/provider";
+import { api, type UpdateUserPayload } from "@/lib/api-client";
 import {
   getNotificationPermission,
   requestNotificationPermission,
@@ -35,6 +37,7 @@ const LEVELS: EnglishLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 export default function SettingsPage() {
   const dict = useDict();
   const {
+    userId,
     dialect,
     level,
     agentName,
@@ -55,6 +58,16 @@ export default function SettingsPage() {
   const [requested, setRequested] = useState<
     NotificationPermission | "unsupported" | null
   >(null);
+  const saveMutation = useMutation({
+    mutationFn: (payload: UpdateUserPayload) => {
+      if (!userId) throw new Error("A profile must be selected first");
+      return api.updateUser(userId, payload);
+    },
+  });
+  const saveProfile = (payload: UpdateUserPayload) => {
+    if (!userId) return;
+    saveMutation.mutate(payload);
+  };
   const permission =
     requested ?? (mounted ? getNotificationPermission() : "unsupported");
 
@@ -78,6 +91,7 @@ export default function SettingsPage() {
             <Input
               value={agentName}
               onChange={(event) => setAgentName(event.target.value)}
+              onBlur={() => saveProfile({ agentName })}
               maxLength={40}
             />
           </label>
@@ -86,7 +100,11 @@ export default function SettingsPage() {
             {dict.settings.teacherVoice}
             <Select
               value={agentGender}
-              onValueChange={(value) => setAgentGender(value as AgentGender)}
+              onValueChange={(value) => {
+                const nextValue = value as AgentGender;
+                setAgentGender(nextValue);
+                saveProfile({ agentGender: nextValue });
+              }}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -104,7 +122,11 @@ export default function SettingsPage() {
             {dict.settings.dialect}
             <Select
               value={dialect}
-              onValueChange={(value) => setDialect(value as Dialect)}
+              onValueChange={(value) => {
+                const nextValue = value as Dialect;
+                setDialect(nextValue);
+                saveProfile({ preferredDialect: nextValue });
+              }}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -124,7 +146,11 @@ export default function SettingsPage() {
             {dict.settings.yourLevel}
             <Select
               value={level}
-              onValueChange={(value) => setLevel(value as EnglishLevel)}
+              onValueChange={(value) => {
+                const nextValue = value as EnglishLevel;
+                setLevel(nextValue);
+                saveProfile({ englishLevel: nextValue });
+              }}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -138,6 +164,21 @@ export default function SettingsPage() {
               </SelectContent>
             </Select>
           </label>
+
+          {userId && (saveMutation.isPending || saveMutation.isError) && (
+            <p
+              className={
+                saveMutation.isError
+                  ? "text-destructive text-sm"
+                  : "text-muted-foreground text-sm"
+              }
+              role="status"
+            >
+              {saveMutation.isPending
+                ? dict.settings.profileSaving
+                : dict.settings.profileSaveError}
+            </p>
+          )}
 
           <div className="flex items-center justify-between rounded-md border p-3">
             <div>
