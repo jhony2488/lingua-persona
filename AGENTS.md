@@ -47,7 +47,7 @@ npm run mobile:sync       # cap sync
 npm run build:standalone  # complete .next/standalone (static, public, data, .prisma)
 npm run sidecar:bin       # download Node binary for Tauri sidecar
 npm run fetch:books       # download the bundled book corpus → data/library/
-npm run download-models   # self-host WebLLM weights → public/models/ (+manifest.json)
+npm run download-models   # self-host WebLLM + WASM/ONNX weights → public/models/ (+manifest.json)
 ```
 
 ## Structure

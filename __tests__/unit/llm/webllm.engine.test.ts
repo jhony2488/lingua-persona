@@ -48,7 +48,9 @@ describe("initWebLLM", () => {
       .mockRejectedValueOnce(new Error("boom"))
       .mockResolvedValueOnce(fakeEngine());
 
-    await expect(initWebLLM(model)).rejects.toThrow("boom");
+    // First attempt fails
+    await expect(initWebLLM(model)).rejects.toThrow("WebLLM initialization failed");
+    // Second attempt succeeds (retry after cleanup)
     const engine = await initWebLLM(model);
     expect(createMLCEngine).toHaveBeenCalledTimes(2);
     expect(engine).toBeDefined();

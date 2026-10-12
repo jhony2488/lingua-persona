@@ -8,7 +8,7 @@ WebLLM resolves model weights at runtime, in this order:
 
 ## ONNX models for WASM
 
-The CPU fallback uses Transformers.js and ONNX Runtime WebAssembly, with separate models hosted on Hugging Face. These models are not part of the MLC catalog or the `npm run download-models` script.
+The CPU fallback uses Transformers.js and ONNX Runtime WebAssembly, with separate models hosted on Hugging Face. These models are also downloaded by the `npm run download-models` script and follow the same priority logic: local (`/models/`) first, then Hugging Face.
 
 | Profile      | Model                                  | Quantized file        |
 | ------------ | -------------------------------------- | --------------------- |
@@ -16,6 +16,8 @@ The CPU fallback uses Transformers.js and ONNX Runtime WebAssembly, with separat
 | medium/large | `onnx-community/Qwen2.5-1.5B-Instruct` | ONNX `q4f16`, ~1.4 GB |
 
 Transformers.js downloads the model on demand and reuses the browser cache. The first use needs a connection; afterward, inference can work offline while the weights remain cached. Model size respects the device tier, memory, and logical processors reported by the browser. See the [Hardware guide](hardware-guide.md) for limits.
+
+**Loading priority**: both WebLLM and Transformers.js follow the same order: first check `/models/` (self-hosting via `npm run download-models`), then download from Hugging Face if the file doesn't exist locally. This ensures all engines work offline on first use when models are bundled.
 
 ## Download script (optional self-hosting)
 
@@ -48,7 +50,7 @@ At the end, the script writes `public/models/manifest.json` in the format
 > download from Hugging Face — use the script only if you need fully
 > offline first use.
 
-This script downloads WebLLM/MLC models only. It does not self-host the ONNX models used by the WASM fallback.
+This script downloads both WebLLM/MLC models and the ONNX models used by the WASM fallback, all with the same local→remote priority.
 
 ## Browser storage
 

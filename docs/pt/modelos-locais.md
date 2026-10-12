@@ -8,7 +8,7 @@ O WebLLM resolve os pesos do modelo em runtime, nesta ordem:
 
 ## Modelos ONNX para WASM
 
-O fallback em CPU usa Transformers.js e ONNX Runtime WebAssembly, com modelos próprios hospedados no Hugging Face. Eles não são incluídos no catálogo MLC nem no script `npm run download-models`.
+O fallback em CPU usa Transformers.js e ONNX Runtime WebAssembly, com modelos próprios hospedados no Hugging Face. Eles também são baixados pelo script `npm run download-models` e seguem a mesma lógica de prioridade: local (`/models/`) primeiro, depois Hugging Face.
 
 | Perfil       | Modelo                                 | Arquivo quantizado    |
 | ------------ | -------------------------------------- | --------------------- |
@@ -16,6 +16,8 @@ O fallback em CPU usa Transformers.js e ONNX Runtime WebAssembly, com modelos pr
 | medium/large | `onnx-community/Qwen2.5-1.5B-Instruct` | ONNX `q4f16`, ~1,4 GB |
 
 Transformers.js baixa o modelo sob demanda e usa o cache do navegador para reutilizá-lo. O primeiro uso precisa de conexão; depois, a inferência pode funcionar offline enquanto os pesos permanecerem no cache. O tamanho escolhido respeita o tier, a memória e os núcleos reportados pelo dispositivo. Confira os limites em [Guia de hardware](guia-de-hardware.md).
+
+**Prioridade de carregamento**: tanto WebLLM quanto Transformers.js seguem a mesma ordem: primeiro verificam `/models/` (self-hosting via `npm run download-models`), depois baixam do Hugging Face se o arquivo não existir localmente. Isso garante que todos os motores funcionem offline no primeiro uso quando os modelos são empacotados.
 
 ## Script de download (self-hosting opcional)
 
@@ -48,7 +50,7 @@ Ao final, o script escreve `public/models/manifest.json` no formato
 > sob demanda do Hugging Face — use o script só se precisar de offline
 > total no primeiro uso.
 
-Esse script só baixa modelos WebLLM/MLC. Ele não self-hospeda os modelos ONNX usados pelo fallback WASM.
+Esse script baixa tanto modelos WebLLM/MLC quanto os modelos ONNX usados pelo fallback WASM, todos com a mesma prioridade local→remoto.
 
 ## Armazenamento no navegador
 

@@ -68,4 +68,11 @@ describe("generateWasmLLM", () => {
       }),
     );
   });
+
+  it("rejects generation when WASM is not supported", async () => {
+    global.Worker = undefined as unknown as typeof Worker;
+    await expect(
+      generateWasmLLM([{ role: "user", content: "Hello" }], WASM_LLM_MODELS[0]),
+    ).rejects.toThrow("WASM inference is not supported");
+  });
 });
