@@ -9,10 +9,7 @@ import {
 } from "@/lib/llm/models";
 import { useLLMStore } from "@/lib/llm/store";
 import { hasWebGPU, initWebLLM } from "@/lib/llm/webllm.engine";
-import {
-  isWasmSupported,
-  preloadWasmLLM,
-} from "@/lib/llm/wasm.engine";
+import { isWasmSupported, preloadWasmLLM } from "@/lib/llm/wasm.engine";
 import { createSpeechRecognition } from "@/lib/speech";
 import { initWhisper, isWhisperSupported } from "@/lib/stt/whisper.engine";
 import { useSettings } from "@/lib/store/settings";
