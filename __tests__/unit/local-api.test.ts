@@ -40,8 +40,54 @@ describe("localApi (mobile sqlite layer)", () => {
     );
   });
 
-  it("maps unique violation to ApiError 409", async () => {
+  it("returns the existing local user for a duplicate email", async () => {
+    const existing = {
+      id: "u_existing",
+      email: "ana@example.com",
+      name: "Ana",
+      englishLevel: "B2",
+      preferredDialect: "UK",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    };
+    mockDb.query.mockResolvedValueOnce({ values: [existing] });
+
+    const user = await localApi.createUser({
+      email: existing.email,
+      name: "Different name",
+    });
+
+    expect(user.id).toBe(existing.id);
+    expect(user.englishLevel).toBe(existing.englishLevel);
+    expect(user.preferredDialect).toBe(existing.preferredDialect);
+    expect(mockDb.run).not.toHaveBeenCalled();
+  });
+
+  it("returns the user created by a concurrent duplicate request", async () => {
+    const existing = {
+      id: "u_existing",
+      email: "dup@example.com",
+      name: "Existing",
+      englishLevel: "A1",
+      preferredDialect: "US",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    };
     mockDb.run.mockRejectedValueOnce(new Error("UNIQUE constraint failed"));
+    mockDb.query
+      .mockResolvedValueOnce({ values: [] })
+      .mockResolvedValueOnce({ values: [existing] });
+
+    await expect(
+      localApi.createUser({ email: existing.email, name: "New" }),
+    ).resolves.toMatchObject({ id: existing.id });
+  });
+
+  it("maps unrelated insert failure to ApiError 409 when no profile exists", async () => {
+    mockDb.run.mockRejectedValueOnce(new Error("UNIQUE constraint failed"));
+    mockDb.query
+      .mockResolvedValueOnce({ values: [] })
+      .mockResolvedValueOnce({ values: [] });
     await expect(
       localApi.createUser({ email: "dup@example.com", name: "Dup" }),
     ).rejects.toMatchObject({ status: 409, name: "ApiError" });
@@ -79,3 +125,12 @@ describe("localApi (mobile sqlite layer)", () => {
     ).rejects.toMatchObject({ status: 404 });
   });
 });
+
+  it("looks up an existing local profile by email", async () => {
+    const existing = { id: "u_existing", email: "ana@example.com" };
+    mockDb.query.mockResolvedValueOnce({ values: [existing] });
+
+    await expect(localApi.findUserByEmail(existing.email)).resolves.toMatchObject(
+      existing,
+    );
+  });

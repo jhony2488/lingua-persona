@@ -32,8 +32,9 @@ test.describe("Product tour", () => {
     await expect(tourDialog(page)).not.toBeVisible();
 
     const email = `e2e-tour-${Date.now()}@example.com`;
-    await page.getByPlaceholder("Your name").fill("Tour");
     await page.getByPlaceholder("you@example.com").fill(email);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByPlaceholder("Your name").fill("Tour");
     await page.getByRole("button", { name: "Start" }).click();
 
     await expect(tourDialog(page)).toBeVisible();

@@ -3,6 +3,7 @@ import request from "supertest";
 import { prisma } from "@/lib/prisma";
 import { createApp } from "../helpers/app";
 import { GET as listUsers, POST as createUser } from "@/app/api/users/route";
+import { POST as lookupUser } from "@/app/api/users/lookup/route";
 import {
   GET as getUser,
   PATCH as updateUser,
@@ -12,6 +13,7 @@ import {
 const app = createApp({
   "GET /api/users": listUsers,
   "POST /api/users": createUser,
+  "POST /api/users/lookup": lookupUser,
   "GET /api/users/:id": getUser,
   "PATCH /api/users/:id": updateUser,
   "DELETE /api/users/:id": deleteUser,
@@ -29,6 +31,27 @@ afterAll(async () => {
 });
 
 describe("POST /api/users", () => {
+
+  describe("POST /api/users/lookup", () => {
+    it("returns the existing profile for a matching email", async () => {
+      const created = await request(app).post("/api/users").send(validUser);
+      const result = await request(app)
+        .post("/api/users/lookup")
+        .send({ email: validUser.email });
+
+      expect(result.status).toBe(200);
+      expect(result.body.id).toBe(created.body.id);
+    });
+
+    it("returns null when the email has no profile", async () => {
+      const result = await request(app)
+        .post("/api/users/lookup")
+        .send({ email: "new@example.com" });
+
+      expect(result.status).toBe(200);
+      expect(result.body).toBeNull();
+    });
+  });
   it("creates a user and returns 201", async () => {
     const res = await request(app).post("/api/users").send(validUser);
 
@@ -70,14 +93,27 @@ describe("POST /api/users", () => {
     expect(res.status).toBe(400);
   });
 
-  it("returns 409 for duplicate email", async () => {
-    await request(app).post("/api/users").send(validUser).expect(201);
+  it("returns the existing profile for a duplicate email", async () => {
+    const existing = await request(app)
+      .post("/api/users")
+      .send({
+        ...validUser,
+        englishLevel: "B2",
+        preferredDialect: "UK",
+      })
+      .expect(201);
     const res = await request(app)
       .post("/api/users")
       .send({ ...validUser, name: "Outra Ana" });
 
-    expect(res.status).toBe(409);
-    expect(res.body.error.code).toBe("CONFLICT");
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      id: existing.body.id,
+      name: "Ana",
+      englishLevel: "B2",
+      preferredDialect: "UK",
+    });
+    expect(await prisma.user.count()).toBe(1);
   });
 });
 

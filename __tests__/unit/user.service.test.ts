@@ -48,20 +48,24 @@ describe("userService", () => {
       englishLevel: "A1" as const,
       preferredDialect: "US" as const,
     };
-    expect(await userService.create(input)).toEqual(user);
+    expect(await userService.createOrGet(input)).toEqual({
+      user,
+      created: true,
+    });
     expect(repo.create).toHaveBeenCalledWith(input);
   });
 
-  it("rejects duplicate email on create", async () => {
+  it("returns the existing user when email is already in use", async () => {
     repo.findByEmail.mockResolvedValue(user);
-    await expect(
-      userService.create({
+    const result = await userService.createOrGet({
         email: "ana@example.com",
         name: "Outra Ana",
         englishLevel: "A1",
         preferredDialect: "US",
-      }),
-    ).rejects.toMatchObject({ statusCode: 409, code: "CONFLICT" });
+      });
+
+    expect(result).toEqual({ user, created: false });
+    expect(repo.create).not.toHaveBeenCalled();
   });
 
   it("rejects duplicate email on update from another user", async () => {
@@ -86,3 +90,8 @@ describe("userService", () => {
     await expect(userService.get("x")).rejects.toBeInstanceOf(AppError);
   });
 });
+
+  it("finds an existing user by email", async () => {
+    repo.findByEmail.mockResolvedValue(user);
+    await expect(userService.findByEmail(user.email)).resolves.toEqual(user);
+  });
