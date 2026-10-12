@@ -89,6 +89,7 @@ export const dictionary = {
     offlineMode: "Practice mode (offline)",
     engineAuto: "Auto",
     engineWebllm: "WebLLM (browser GPU)",
+    engineWasm: "WASM (device CPU)",
     engineOllama: "Ollama (localhost)",
     engineLocal: "Offline practice",
   },
