@@ -126,11 +126,11 @@ describe("localApi (mobile sqlite layer)", () => {
   });
 });
 
-  it("looks up an existing local profile by email", async () => {
-    const existing = { id: "u_existing", email: "ana@example.com" };
-    mockDb.query.mockResolvedValueOnce({ values: [existing] });
+it("looks up an existing local profile by email", async () => {
+  const existing = { id: "u_existing", email: "ana@example.com" };
+  mockDb.query.mockResolvedValueOnce({ values: [existing] });
 
-    await expect(localApi.findUserByEmail(existing.email)).resolves.toMatchObject(
-      existing,
-    );
-  });
+  await expect(localApi.findUserByEmail(existing.email)).resolves.toMatchObject(
+    existing,
+  );
+});

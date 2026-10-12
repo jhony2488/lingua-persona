@@ -58,11 +58,11 @@ describe("userService", () => {
   it("returns the existing user when email is already in use", async () => {
     repo.findByEmail.mockResolvedValue(user);
     const result = await userService.createOrGet({
-        email: "ana@example.com",
-        name: "Outra Ana",
-        englishLevel: "A1",
-        preferredDialect: "US",
-      });
+      email: "ana@example.com",
+      name: "Outra Ana",
+      englishLevel: "A1",
+      preferredDialect: "US",
+    });
 
     expect(result).toEqual({ user, created: false });
     expect(repo.create).not.toHaveBeenCalled();
@@ -91,7 +91,7 @@ describe("userService", () => {
   });
 });
 
-  it("finds an existing user by email", async () => {
-    repo.findByEmail.mockResolvedValue(user);
-    await expect(userService.findByEmail(user.email)).resolves.toEqual(user);
-  });
+it("finds an existing user by email", async () => {
+  repo.findByEmail.mockResolvedValue(user);
+  await expect(userService.findByEmail(user.email)).resolves.toEqual(user);
+});

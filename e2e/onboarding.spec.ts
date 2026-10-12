@@ -29,7 +29,10 @@ test.describe("Onboarding", () => {
     expect(stored).not.toContain('"userId":null');
   });
 
-  test("restores an existing profile for duplicate email", async ({ page, request }) => {
+  test("restores an existing profile for duplicate email", async ({
+    page,
+    request,
+  }) => {
     const email = `e2e-dup-${Date.now()}@example.com`;
     const created = await request.post("/api/users", {
       data: {

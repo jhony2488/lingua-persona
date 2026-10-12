@@ -31,7 +31,6 @@ afterAll(async () => {
 });
 
 describe("POST /api/users", () => {
-
   describe("POST /api/users/lookup", () => {
     it("returns the existing profile for a matching email", async () => {
       const created = await request(app).post("/api/users").send(validUser);
