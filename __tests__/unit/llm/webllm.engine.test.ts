@@ -17,7 +17,11 @@ jest.mock("@mlc-ai/web-llm", () => ({
 
 import { CreateMLCEngine } from "@mlc-ai/web-llm";
 import { LLM_MODELS } from "@/lib/llm/models";
-import { initWebLLM, resetWebLLM } from "@/lib/llm/webllm.engine";
+import {
+  buildModelAppConfig,
+  initWebLLM,
+  resetWebLLM,
+} from "@/lib/llm/webllm.engine";
 
 const createMLCEngine = CreateMLCEngine as jest.Mock;
 const mockFetch = jest.fn();
@@ -57,5 +61,37 @@ describe("initWebLLM", () => {
     const second = await initWebLLM(model);
     expect(createMLCEngine).toHaveBeenCalledTimes(1);
     expect(second).toBe(first);
+  });
+});
+
+describe("buildModelAppConfig", () => {
+  it("resolves self-hosted weights from the downloader's model directory", () => {
+    const model = LLM_MODELS[0];
+    const config = buildModelAppConfig(
+      [model],
+      [],
+      {
+        models: [{ modelId: model.modelId, modelLib: "model.wasm" }],
+      },
+    );
+
+    expect(config.model_list[0]).toEqual({
+      model_id: model.modelId,
+      model: `/models/${model.modelId}/resolve/main`,
+      model_lib: "/models/libs/model.wasm",
+    });
+  });
+
+  it("keeps the Hugging Face record when local weights are unavailable", () => {
+    const model = LLM_MODELS[0];
+    const remote = {
+      model_id: model.modelId,
+      model: "https://huggingface.co/model",
+      model_lib: "https://huggingface.co/model/lib.wasm",
+    };
+
+    expect(buildModelAppConfig([model], [remote], null).model_list[0]).toBe(
+      remote,
+    );
   });
 });

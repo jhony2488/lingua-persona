@@ -23,6 +23,7 @@ export async function hasWebGPU(): Promise<boolean> {
 
 interface ModelsManifest {
   models: { modelId: string; modelLib: string }[];
+  wasmModels?: string[];
 }
 
 let manifestPromise: Promise<ModelsManifest | null> | null = null;
@@ -39,34 +40,46 @@ function fetchManifest(): Promise<ModelsManifest | null> {
   return manifestPromise;
 }
 
-/**
- * Resolve a fonte dos pesos de cada modelo do catálogo:
- * /models/* (self-host, empacotado) → Hugging Face (prebuiltAppConfig).
- */
-export async function resolveAppConfig(): Promise<AppConfig> {
-  const { prebuiltAppConfig } = await import("@mlc-ai/web-llm");
-  const manifest = await fetchManifest();
+export function buildModelAppConfig(
+  models: LLMModel[],
+  prebuiltModelList: ModelRecord[],
+  manifest: ModelsManifest | null,
+  preferLocal = true,
+): AppConfig {
   const local = new Map(
-    (manifest?.models ?? []).map((m) => [m.modelId, m.modelLib]),
+    (manifest?.models ?? []).map((model) => [model.modelId, model.modelLib]),
   );
-
-  const model_list: ModelRecord[] = LLM_MODELS.map((model) => {
-    const modelLib = local.get(model.modelId);
+  const model_list = models.map((model) => {
+    const modelLib = preferLocal ? local.get(model.modelId) : undefined;
     if (modelLib) {
       return {
         model_id: model.modelId,
-        model: `/models/${model.modelId}`,
+        model: `/models/${model.modelId}/resolve/main`,
         model_lib: `/models/libs/${modelLib}`,
       };
     }
-    const record = prebuiltAppConfig.model_list.find(
-      (r) => r.model_id === model.modelId,
+    const record = prebuiltModelList.find(
+      (candidate) => candidate.model_id === model.modelId,
     );
     if (!record) throw new Error(`Unknown model_id: ${model.modelId}`);
     return record;
   });
-
   return { model_list };
+}
+
+/**
+ * Resolve a fonte dos pesos de cada modelo do catálogo:
+ * /models/* (self-host, empacotado) → Hugging Face (prebuiltAppConfig).
+ */
+export async function resolveAppConfig(preferLocal = true): Promise<AppConfig> {
+  const { prebuiltAppConfig } = await import("@mlc-ai/web-llm");
+  const manifest = await fetchManifest();
+  return buildModelAppConfig(
+    LLM_MODELS,
+    prebuiltAppConfig.model_list,
+    manifest,
+    preferLocal,
+  );
 }
 
 let enginePromise: Promise<WebWorkerMLCEngine> | null = null;
@@ -78,6 +91,26 @@ function createWorker(): Worker {
   return new Worker(new URL("./webllm.worker.ts", import.meta.url), {
     type: "module",
   });
+}
+
+async function createEngine(
+  webllm: typeof import("@mlc-ai/web-llm"),
+  modelId: string,
+  appConfig: AppConfig,
+  onProgress?: ProgressCallback,
+): Promise<WebWorkerMLCEngine> {
+  const config = { appConfig, initProgressCallback: onProgress };
+  let worker: Worker | null = null;
+  try {
+    worker = createWorker();
+    return await webllm.CreateWebWorkerMLCEngine(worker, modelId, config);
+  } catch {
+    worker?.terminate();
+    return (await webllm.CreateMLCEngine(
+      modelId,
+      config,
+    )) as unknown as WebWorkerMLCEngine;
+  }
 }
 
 /**
@@ -92,18 +125,16 @@ export async function initWebLLM(
   const appConfig = await resolveAppConfig();
   if (!enginePromise) {
     const pending = (async () => {
-      const config = { appConfig, initProgressCallback: onProgress };
       try {
-        return await webllm.CreateWebWorkerMLCEngine(
-          createWorker(),
-          model.modelId,
-          config,
-        );
+        return await createEngine(webllm, model.modelId, appConfig, onProgress);
       } catch {
-        return (await webllm.CreateMLCEngine(
-          model.modelId,
-          config,
-        )) as unknown as WebWorkerMLCEngine;
+        const manifest = await fetchManifest();
+        const hasLocalModel = manifest?.models.some(
+          (entry) => entry.modelId === model.modelId,
+        );
+        if (!hasLocalModel) throw new Error("WebLLM initialization failed");
+        const remoteConfig = await resolveAppConfig(false);
+        return createEngine(webllm, model.modelId, remoteConfig, onProgress);
       }
     })();
     enginePromise = pending;

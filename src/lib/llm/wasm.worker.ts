@@ -55,7 +55,10 @@ async function getGenerator(
 
   if (!generatorPromise) {
     const pending = (async () => {
-      const { pipeline } = await import("@huggingface/transformers");
+      const { env, pipeline } = await import("@huggingface/transformers");
+      env.localModelPath = "/models/";
+      env.allowLocalModels = true;
+      env.allowRemoteModels = true;
       const createPipeline = pipeline as unknown as PipelineFactory;
       return createPipeline("text-generation", model.modelId, {
         device: "wasm",

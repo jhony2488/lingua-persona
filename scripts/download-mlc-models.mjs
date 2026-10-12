@@ -37,6 +37,16 @@ const WHISPER_MODELS = [
   { modelId: "Xenova/whisper-tiny", repo: "Xenova/whisper-tiny" },
 ];
 
+const WASM_MODELS = [
+  "onnx-community/Qwen2.5-0.5B-Instruct",
+  "onnx-community/Qwen2.5-1.5B-Instruct",
+].map((modelId) => ({
+  modelId,
+  repo: modelId,
+  includeFile: (file) =>
+    !file.startsWith("onnx/") || file === "onnx/model_q4f16.onnx",
+}));
+
 function getClient(url) {
   return url.startsWith("https:") ? https : http;
 }
@@ -99,14 +109,19 @@ async function downloadFile(url, dest) {
   });
 }
 
-async function downloadHfFiles(repo, targetDir) {
+async function downloadHfFiles(
+  repo,
+  targetDir,
+  { recursive = false, includeFile = () => true } = {},
+) {
   console.log(`[download-mlc] listing ${repo}...`);
   const tree = await getJson(
-    `https://huggingface.co/api/models/${repo}/tree/main/`,
+    `https://huggingface.co/api/models/${repo}/tree/main/${recursive ? "?recursive=true" : ""}`,
   );
 
   for (const item of tree) {
     if (item.type !== "file") continue;
+    if (!includeFile(item.path)) continue;
     if ([".gitattributes", "README.md", "logs.txt"].includes(item.path))
       continue;
     const dest = path.join(targetDir, item.path);
@@ -154,6 +169,14 @@ async function main() {
     }
   }
 
+  for (const { repo, includeFile } of WASM_MODELS) {
+    const targetDir = path.join(root, "public", "models", ...repo.split("/"));
+    await downloadHfFiles(repo, targetDir, {
+      recursive: true,
+      includeFile,
+    });
+  }
+
   for (const { repo } of WHISPER_MODELS) {
     const targetDir = path.join(root, "public", "models", ...repo.split("/"));
     await downloadHfFiles(repo, targetDir);
@@ -163,6 +186,7 @@ async function main() {
   // /models/* (self-hosted) ou baixa do Hugging Face (prebuiltAppConfig).
   const manifest = {
     models: MODELS.map(({ modelId, modelLib }) => ({ modelId, modelLib })),
+    wasmModels: WASM_MODELS.map(({ modelId }) => modelId),
   };
   const manifestPath = path.join(root, "public", "models", "manifest.json");
   fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
