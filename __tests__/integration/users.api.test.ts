@@ -152,11 +152,20 @@ describe("PATCH /api/users/:id", () => {
       .body;
     const res = await request(app)
       .patch(`/api/users/${created.id}`)
-      .send({ name: "Ana Paula", englishLevel: "B1" });
+      .send({
+        agentName: "Maya",
+        agentGender: "female",
+        englishLevel: "B1",
+        preferredDialect: "UK",
+      });
 
     expect(res.status).toBe(200);
-    expect(res.body.name).toBe("Ana Paula");
-    expect(res.body.englishLevel).toBe("B1");
+    expect(res.body).toMatchObject({
+      agentName: "Maya",
+      agentGender: "female",
+      englishLevel: "B1",
+      preferredDialect: "UK",
+    });
   });
 
   it("returns 404 for unknown id", async () => {

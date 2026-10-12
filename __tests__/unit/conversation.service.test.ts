@@ -14,6 +14,8 @@ const user: User = {
   id: "u_1",
   email: "ana@example.com",
   name: "Ana",
+  agentName: "Alex",
+  agentGender: "male",
   englishLevel: "A1",
   preferredDialect: "US",
   createdAt: new Date(),

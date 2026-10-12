@@ -32,11 +32,39 @@ describe("localApi (mobile sqlite layer)", () => {
     const user = await localApi.createUser({
       email: "ana@example.com",
       name: "Ana",
+      agentName: "Maya",
+      agentGender: "female",
     });
     expect(user.email).toBe("ana@example.com");
+    expect(user.agentName).toBe("Maya");
+    expect(user.agentGender).toBe("female");
     expect(mockDb.run).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO "User"'),
       expect.arrayContaining(["ana@example.com", "Ana"]),
+    );
+  });
+
+  it("updates profile settings in SQLite", async () => {
+    const profile = {
+      id: "u_1",
+      agentName: "Maya",
+      agentGender: "female",
+      englishLevel: "B2",
+      preferredDialect: "UK",
+    };
+    mockDb.query.mockResolvedValueOnce({ values: [profile] });
+
+    await expect(
+      localApi.updateUser("u_1", {
+        agentName: "Maya",
+        agentGender: "female",
+        englishLevel: "B2",
+        preferredDialect: "UK",
+      }),
+    ).resolves.toMatchObject(profile);
+    expect(mockDb.run).toHaveBeenCalledWith(
+      expect.stringContaining('UPDATE "User" SET'),
+      expect.arrayContaining(["Maya", "female", "B2", "UK", "u_1"]),
     );
   });
 

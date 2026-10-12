@@ -12,6 +12,8 @@ const user: User = {
   id: "u_1",
   email: "ana@example.com",
   name: "Ana",
+  agentName: "Alex",
+  agentGender: "male",
   englishLevel: "A1",
   preferredDialect: "US",
   createdAt: new Date(),
@@ -45,6 +47,8 @@ describe("userService", () => {
     const input = {
       email: "ana@example.com",
       name: "Ana",
+      agentName: "Alex",
+      agentGender: "male" as const,
       englishLevel: "A1" as const,
       preferredDialect: "US" as const,
     };
@@ -60,6 +64,8 @@ describe("userService", () => {
     const result = await userService.createOrGet({
       email: "ana@example.com",
       name: "Outra Ana",
+      agentName: "Alex",
+      agentGender: "male",
       englishLevel: "A1",
       preferredDialect: "US",
     });

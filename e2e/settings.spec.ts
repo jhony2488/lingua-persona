@@ -30,10 +30,11 @@ test.describe("Settings", () => {
     await seedProfile(page, userId);
   });
 
-  test("persists teacher name and gender across reloads", async ({ page }) => {
+  test("persists teacher name and gender to the profile", async ({ page, request, userId }) => {
     await goto(page, urls.settings);
 
     await page.getByLabel("Teacher name").fill("Maya");
+    await page.getByLabel("Teacher name").press("Tab");
     await selectOption(page, "Teacher voice", /Female/);
 
     await page.reload();
@@ -47,9 +48,14 @@ test.describe("Settings", () => {
 
     const stored = await storedSettings(page);
     expect(stored.agentGender).toBe("female");
+    const profile = await request.get(`/api/users/${userId}`);
+    expect(await profile.json()).toMatchObject({
+      agentName: "Maya",
+      agentGender: "female",
+    });
   });
 
-  test("persists level and dialect across reloads", async ({ page }) => {
+  test("persists level and dialect to the profile", async ({ page, request, userId }) => {
     await goto(page, urls.settings);
 
     await selectOption(page, "Dialect", "British English");
@@ -72,5 +78,10 @@ test.describe("Settings", () => {
     const stored = await storedSettings(page);
     expect(stored.dialect).toBe("UK");
     expect(stored.level).toBe("B2");
+    const profile = await request.get(`/api/users/${userId}`);
+    expect(await profile.json()).toMatchObject({
+      preferredDialect: "UK",
+      englishLevel: "B2",
+    });
   });
 });
