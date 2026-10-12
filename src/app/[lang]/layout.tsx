@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { ModelDownloadProgress } from "@/components/model-download-progress";
 import { ModelPreloader } from "@/components/model-preloader";
 import { InstallBanner } from "@/components/pwa/install-banner";
 import { SwRegister } from "@/components/pwa/sw-register";
@@ -108,6 +109,7 @@ export default async function RootLayout({
                 </div>
               </nav>
             </header>
+            <ModelDownloadProgress />
             <div className="flex-1">{children}</div>
             <footer className="text-muted-foreground border-t py-4 text-center text-xs">
               {dict.footer.tagline}

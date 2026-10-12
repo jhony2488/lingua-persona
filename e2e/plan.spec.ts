@@ -23,6 +23,22 @@ test.describe("Study plan", () => {
     await expect(page.getByText(/^Week 4:/)).toBeVisible();
   });
 
+  test("generates and groups a monthly plan", async ({ page, userId }) => {
+    await seedProfile(page, userId);
+    await goto(page, urls.plan);
+
+    await page.getByRole("button", { name: "Monthly" }).click();
+    await page.getByLabel("Months").selectOption("2");
+    await page.getByRole("button", { name: "Generate plan" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: /2-month balanced plan at A1/ }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Month 1" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Month 2" })).toBeVisible();
+    await expect(page.getByText(/^Week 8:/)).toBeVisible();
+  });
+
   test("speaking focus removes study references", async ({ page, userId }) => {
     await seedProfile(page, userId);
     await goto(page, urls.plan);

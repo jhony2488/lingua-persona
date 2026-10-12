@@ -10,6 +10,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { format } from "@/i18n/format";
 import { useDict, useLocale } from "@/i18n/provider";
 import type { PlanJson, WeekPlan } from "@/modules/study/plan-generator";
+import type { PlanDurationUnit } from "@/modules/study/plan.schema";
 
 function WeekCard({ week }: { week: WeekPlan }) {
   const dict = useDict();
@@ -51,6 +52,16 @@ function PlanCard({ plan }: { plan: StudyPlan }) {
   const dict = useDict();
   const locale = useLocale();
   const planJson = JSON.parse(plan.planJson) as PlanJson;
+  const isMonthly = planJson.durationUnit === "month";
+  const monthlyGroups = isMonthly
+    ? Array.from(
+        { length: Math.ceil(planJson.weeks.length / 4) },
+        (_, index) => ({
+          month: index + 1,
+          weeks: planJson.weeks.slice(index * 4, index * 4 + 4),
+        }),
+      )
+    : [];
   return (
     <section className="space-y-3">
       <div>
@@ -62,11 +73,28 @@ function PlanCard({ plan }: { plan: StudyPlan }) {
           })}
         </p>
       </div>
-      <ol className="grid gap-3 sm:grid-cols-2">
-        {planJson.weeks.map((week) => (
-          <WeekCard key={week.week} week={week} />
-        ))}
-      </ol>
+      {isMonthly ? (
+        <div className="space-y-6">
+          {monthlyGroups.map((group) => (
+            <section key={group.month} className="space-y-3">
+              <h3 className="font-semibold">
+                {format(dict.plan.monthTitle, { month: String(group.month) })}
+              </h3>
+              <ol className="grid gap-3 sm:grid-cols-2">
+                {group.weeks.map((week) => (
+                  <WeekCard key={week.week} week={week} />
+                ))}
+              </ol>
+            </section>
+          ))}
+        </div>
+      ) : (
+        <ol className="grid gap-3 sm:grid-cols-2">
+          {planJson.weeks.map((week) => (
+            <WeekCard key={week.week} week={week} />
+          ))}
+        </ol>
+      )}
     </section>
   );
 }
@@ -76,7 +104,8 @@ export default function PlanPage() {
   const locale = useLocale();
   const userId = useSettings((s) => s.userId);
   const queryClient = useQueryClient();
-  const [weeks, setWeeks] = useState(4);
+  const [durationUnit, setDurationUnit] = useState<PlanDurationUnit>("week");
+  const [duration, setDuration] = useState(4);
   const [focus, setFocus] = useState<"grammar" | "speaking" | "balanced">(
     "balanced",
   );
@@ -88,7 +117,14 @@ export default function PlanPage() {
   });
 
   const generateMutation = useMutation({
-    mutationFn: () => api.generateStudyPlan({ userId: userId!, weeks, focus }),
+    mutationFn: () =>
+      api.generateStudyPlan({
+        userId: userId!,
+        weeks: durationUnit === "month" ? duration * 4 : duration,
+        durationUnit,
+        duration,
+        focus,
+      }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["study-plans", userId] }),
   });
@@ -126,18 +162,46 @@ export default function PlanPage() {
               generateMutation.mutate();
             }}
           >
+            <div className="grid gap-1 text-sm">
+              <span>{dict.plan.periodUnit}</span>
+              <div
+                className="inline-flex h-8 items-center rounded-md border p-0.5"
+                role="group"
+                aria-label={dict.plan.periodUnit}
+              >
+                {(["week", "month"] as const).map((unit) => (
+                  <button
+                    key={unit}
+                    type="button"
+                    aria-pressed={durationUnit === unit}
+                    className={buttonVariants({
+                      variant: durationUnit === unit ? "secondary" : "ghost",
+                      size: "sm",
+                    })}
+                    onClick={() => {
+                      setDurationUnit(unit);
+                      setDuration(unit === "week" ? 4 : 1);
+                    }}
+                  >
+                    {unit === "week" ? dict.plan.weekUnit : dict.plan.monthUnit}
+                  </button>
+                ))}
+              </div>
+            </div>
             <label className="grid gap-1 text-sm">
-              {dict.plan.weeks}
+              {durationUnit === "week" ? dict.plan.weeks : dict.plan.months}
               <select
                 className="bg-background rounded-md border px-2 py-1"
-                value={weeks}
-                onChange={(event) => setWeeks(Number(event.target.value))}
+                value={duration}
+                onChange={(event) => setDuration(Number(event.target.value))}
               >
-                {[2, 4, 6, 8, 12].map((w) => (
-                  <option key={w} value={w}>
-                    {w}
-                  </option>
-                ))}
+                {(durationUnit === "week" ? [2, 4, 6, 8, 12] : [1, 2, 3]).map(
+                  (value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ),
+                )}
               </select>
             </label>
             <label className="grid gap-1 text-sm">

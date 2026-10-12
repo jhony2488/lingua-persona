@@ -55,6 +55,23 @@ describe("generatePlan", () => {
     expect(plan.weeks).toHaveLength(4);
     expect(plan.level).toBe("B1");
     expect(plan.summary).toContain("B1");
+    expect(plan.durationUnit).toBe("week");
+  });
+
+  it("preserves the monthly duration while generating weekly details", () => {
+    const plan = generatePlan({
+      level: "B1",
+      weeks: 8,
+      durationUnit: "month",
+      duration: 2,
+      usedTopics: [],
+      books,
+    });
+
+    expect(plan.weeks).toHaveLength(8);
+    expect(plan.durationUnit).toBe("month");
+    expect(plan.duration).toBe(2);
+    expect(plan.summary).toContain("2-month");
   });
 
   it("only includes books at or below the user's level", () => {

@@ -17,6 +17,8 @@ export interface ManifestBook {
 export interface GeneratePlanInput {
   level: EnglishLevel;
   weeks: number;
+  durationUnit?: "week" | "month";
+  duration?: number;
   focus?: "grammar" | "speaking" | "balanced";
   /** Temas/títulos já usados em conversas — excluídos dos tópicos. */
   usedTopics: string[];
@@ -36,6 +38,8 @@ export interface PlanJson {
   summary: string;
   level: EnglishLevel;
   focus: string;
+  durationUnit?: "week" | "month";
+  duration?: number;
   weeks: WeekPlan[];
 }
 
@@ -78,6 +82,8 @@ function goalsForWeek(
 
 export function generatePlan(input: GeneratePlanInput): PlanJson {
   const focus = input.focus ?? "balanced";
+  const durationUnit = input.durationUnit ?? "week";
+  const duration = input.duration ?? input.weeks;
   const { study, reading } = booksAtLevel(input.books, input.level);
   const topics = availableTopics(input.level, input.usedTopics);
   const ownLevelTopics = topicsForLevel(input.level).filter(
@@ -133,9 +139,14 @@ export function generatePlan(input: GeneratePlanInput): PlanJson {
   }
 
   return {
-    summary: `${input.weeks}-week ${focus} plan at ${input.level} level`,
+    summary:
+      durationUnit === "month"
+        ? `${duration}-month ${focus} plan at ${input.level} level`
+        : `${input.weeks}-week ${focus} plan at ${input.level} level`,
     level: input.level,
     focus,
+    durationUnit,
+    duration,
     weeks,
   };
 }

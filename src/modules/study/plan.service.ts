@@ -58,6 +58,8 @@ export const studyPlanService = {
     const planJson: PlanJson = generatePlan({
       level: toEnglishLevel(user.englishLevel),
       weeks: input.weeks,
+      durationUnit: input.durationUnit,
+      duration: input.duration,
       focus: input.focus,
       usedTopics,
       books: loadManifestBooks(),

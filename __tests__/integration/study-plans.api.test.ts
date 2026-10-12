@@ -58,6 +58,29 @@ describe("POST /api/study-plans", () => {
     expect(plan.weeks[0].topics.length).toBeGreaterThan(0);
   });
 
+  it("normalizes a monthly plan to four weeks per month", async () => {
+    const userId = await seedUser("B1");
+    const res = await request(app)
+      .post("/api/study-plans")
+      .send({ userId, durationUnit: "month", duration: 2, focus: "grammar" });
+
+    expect(res.status).toBe(201);
+    expect(res.body.weeks).toBe(8);
+    const plan = JSON.parse(res.body.planJson);
+    expect(plan.durationUnit).toBe("month");
+    expect(plan.duration).toBe(2);
+    expect(plan.weeks).toHaveLength(8);
+  });
+
+  it("rejects a monthly plan longer than twelve weeks", async () => {
+    const userId = await seedUser("B1");
+    const res = await request(app)
+      .post("/api/study-plans")
+      .send({ userId, durationUnit: "month", duration: 4 });
+
+    expect(res.status).toBe(422);
+  });
+
   it("excludes topics already used as conversation titles", async () => {
     const userId = await seedUser("B1");
     await prisma.conversation.create({
