@@ -24,8 +24,9 @@ function isSaveData(): boolean {
 }
 
 /**
- * Aquece o engine de LLM selecionado em background e o Whisper quando a Web
- * Speech API não existir. Respeita Save-Data e os limites de hardware.
+ * Aquece o engine escolhido em background e o Whisper quando necessário.
+ * WASM só é pré-carregado quando selecionado, evitando download inesperado
+ * no modo automático. Respeita Save-Data e os limites de hardware.
  */
 export function ModelPreloader() {
   const llmEngine = useSettings((s) => s.llmEngine);
@@ -44,6 +45,29 @@ export function ModelPreloader() {
         pickDefaultModel(capabilities);
       const preference = llmEngine ?? "auto";
       const store = useLLMStore.getState();
+
+      if (preference === "wasm") {
+        const wasmModel = pickWasmModel(capabilities, model.tier);
+        if (!wasmModel || !isWasmSupported()) return;
+
+        store.setModelId(wasmModel.modelId);
+        store.setStatus("downloading");
+        try {
+          await preloadWasmLLM(wasmModel, (progress, text) => {
+            store.setProgress(progress, text);
+          });
+          if (cancelled) return;
+          store.setStatus("ready");
+          store.setEngine("wasm");
+        } catch {
+          if (!cancelled) {
+            store.setStatus("idle");
+            store.setEngine(null);
+          }
+        }
+        return;
+      }
+
       if (preference === "auto" || preference === "webllm") {
         if (!cancelled && (await hasWebGPU())) {
           store.setModelId(model.modelId);
@@ -55,44 +79,12 @@ export function ModelPreloader() {
             if (cancelled) return;
             store.setStatus("ready");
             store.setEngine("webllm");
-            return;
           } catch {
-            // Continue to the CPU fallback if WebLLM cannot initialize.
+            if (!cancelled) {
+              store.setStatus("idle");
+              store.setEngine(null);
+            }
           }
-        }
-      }
-
-      if (
-        cancelled ||
-        (preference !== "auto" &&
-          preference !== "webllm" &&
-          preference !== "wasm")
-      ) {
-        return;
-      }
-
-      const wasmModel = pickWasmModel(capabilities, model.tier);
-      if (!wasmModel || !isWasmSupported()) {
-        if (!cancelled) {
-          store.setStatus("idle");
-          store.setEngine(null);
-        }
-        return;
-      }
-
-      store.setModelId(wasmModel.modelId);
-      store.setStatus("downloading");
-      try {
-        await preloadWasmLLM(wasmModel, (progress, text) => {
-          store.setProgress(progress, text);
-        });
-        if (cancelled) return;
-        store.setStatus("ready");
-        store.setEngine("wasm");
-      } catch {
-        if (!cancelled) {
-          store.setStatus("idle");
-          store.setEngine(null);
         }
       }
     };
